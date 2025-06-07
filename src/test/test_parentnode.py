@@ -1,5 +1,7 @@
 import unittest
+from src.parentnode import ParentNode
 from src.htmlnode import HTMLNode
+from src.leafnode import LeafNode
 ''' ##INFO##
     def __init__(self, tag=None, value=None, children=None,props=None):
         self.tag=tag                #string <a>
@@ -8,19 +10,39 @@ from src.htmlnode import HTMLNode
         self.props=props            #dictionary {"href": "www.google.com"}
 '''
 
-class TestHTMLNode(unittest.TestCase):
+class TestParentNode(unittest.TestCase):
     def test_properties_types(self):
-        node1 = HTMLNode("a","my_url",children=None, props={"href":"https://www.google.be","target":"_blanc"})
+        
         node2 = HTMLNode("p", "Test", props={"style":"color:green"})
-        childnodes= [node2]
-        node1.children=childnodes
+        node3 = HTMLNode("li","my text")
+        node4 = ParentNode("lo", [node3])
+        
+        node1 = ParentNode("a",[node2, node4], {"href":"https://www.google.be","target":"_blanc"})
+        
         
         self.assertEqual(type(node1.tag), str)
-        self.assertEqual(type(node1.value), str)
         self.assertEqual(type(node1.children), list)
-        self.assertEqual(type(node1.children[0]), HTMLNode)
+        self.assertIsInstance(node1.children[0], HTMLNode) #(HTMLNode,ParentNode,LeafNode))
         self.assertEqual(type(node1.props), dict)
 
+
+########not working yet
+
+    def test_L5parentNode(self):
+        node = ParentNode(
+                "p",
+                [
+                LeafNode("b", "Bold text"),
+                LeafNode(None, "Normal text"),
+                LeafNode("i", "italic text"),
+                LeafNode(None, "Normal text"),
+                ],
+            )
+
+        print_test=node.to_html()
+        self.assertEqual(print_test, "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>")
+
+##########todo update to ParentNodes
     def test_properties(self):        
         #node=HTMLNode(value="test")
         node = HTMLNode("p", "Test", props={"style":"color:green"})

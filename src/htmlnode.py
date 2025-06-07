@@ -1,6 +1,6 @@
 
 
-class HTMLNode:
+class HTMLNode():
     def __init__(self, tag=None, value=None, children=None,props=None):
         self.tag=tag                #string <a>
         self.value=value            #string the text inside a <p>paragraph</p>
@@ -16,6 +16,15 @@ class HTMLNode:
     
     def to_html(self):
         raise NotImplementedError
+    
+    def props_to_html(self):
+        result = ""
+        if self.props == None:
+            return ""
+        if self.props:
+            for key, value in self.props.items():
+                result += f' {key}="{value}"'
+            return result
     
     def __eq__(self, other):
         if not isinstance(other, HTMLNode):
