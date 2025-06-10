@@ -24,15 +24,18 @@ class TestLeafNode(unittest.TestCase):
 
     def test_leaf_to_html_p(self):
         node = LeafNode("p", "text")
-        self.assertEqual(node.to_html(), "<p>text</p>")
+        result=node.to_html()
+        self.assertEqual(result, "<p>text</p>")
 
     def test_leaf_to_html_code(self):
         node = LeafNode("code", "print('text'")
-        self.assertEqual(node.to_html(), "<code>print('text'</code>")
+        result=node.to_html()
+        self.assertEqual(result, "<code>print('text'</code>")
 
     def test_leaf_to_html_i(self):
         node = LeafNode("i", "shrugs")
-        self.assertEqual(node.to_html(), "<i>shrugs</i>")
+        result=node.to_html()
+        self.assertEqual(result, "<i>shrugs</i>")
 
     def test_leaf_to_html_value_none(self):
         with self.assertRaises(ValueError):
@@ -40,7 +43,8 @@ class TestLeafNode(unittest.TestCase):
 
     def test_leaf_to_html_tag_none(self):
         node = LeafNode("", "text")
-        self.assertEqual(node.to_html(), "text")
+        result=node.to_html()
+        self.assertEqual(result, "text")
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

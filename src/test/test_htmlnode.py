@@ -1,12 +1,18 @@
+
+''' 
+BECAME OBSOLETE AS HTMLNODE IS NOW ABSTRACT
+no instance of HTMLNode can be created
+
+
 import unittest
 from src.htmlnode import HTMLNode
-''' ##INFO##
+ ##INFO##
     def __init__(self, tag=None, value=None, children=None,props=None):
         self.tag=tag                #string <a>
         self.value=value            #string the text inside a <p>paragraph</p>
         self.children=children    #list of HTMLNode []
         self.props=props            #dictionary {"href": "www.google.com"}
-'''
+
 
 class TestHTMLNode(unittest.TestCase):
     def test_properties_types(self):
@@ -62,3 +68,4 @@ class TestHTMLNode(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+'''

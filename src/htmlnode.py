@@ -1,6 +1,7 @@
+from abc import ABC, abstractmethod
 
-
-class HTMLNode():
+#ABC =  abstract base class => it doesn't allow HTMLNodes to be created
+class HTMLNode(ABC):
     def __init__(self, tag=None, value=None, children=None,props=None):
         self.tag=tag                #string <a>
         self.value=value            #string the text inside a <p>paragraph</p>
@@ -14,8 +15,11 @@ class HTMLNode():
         An HTMLNode without props simply won't have any attributes
     '''
     
+    #ABC =  abstract base class
+    @abstractmethod
     def to_html(self):
-        raise NotImplementedError
+        pass
+        # raise NotImplementedError
     
     def props_to_html(self):
         result = ""
@@ -43,10 +47,10 @@ class HTMLNode():
         if not (self.value is None):
             result+=f"text-inside: {self.value!r}\n"
         if not (self.children is None):
-            result+=f"childnodes: {self.children!r}\n"
+            result+=f"props: {self.children!r}\n"
         if not (self.props is None):
             result+=f"Props:\n"
-            props_string=", ".join(f"{key!r}: {value!r}" for key, value in self.props.items())
+            props_string=", ".join(f"{key!r}:{value!r}" for key, value in self.props.items())
             result+=props_string
         
         return result

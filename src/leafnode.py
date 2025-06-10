@@ -1,4 +1,4 @@
-from .htmlnode import HTMLNode
+from src.htmlnode import HTMLNode
 
 
 #We call it a "leaf" node because it's a "leaf" in the tree of HTML nodes. 
@@ -9,7 +9,7 @@ from .htmlnode import HTMLNode
 class LeafNode(HTMLNode):
     def __init__(self,tag,value, props=None):
         if (value is not None):
-            super().__init__(tag, value, props)
+            super().__init__(tag, value, props=props)
         else:
             raise ValueError("LeafNode must have a value.")
         
@@ -23,10 +23,11 @@ class LeafNode(HTMLNode):
                 self.props == other.props)
 
     def to_html(self):
-        print("hello from LeafNode.ToHTML()")
+        #print("hello from LeafNode.ToHTML()")
         if self.value == None:
-            print("DEBUG: node missing value:", self)
+            #print("DEBUG: node missing value:", self)
             raise ValueError("'value' property must contain a value.")
         if self.tag is None or self.tag == "":
             return self.value
-        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+        else:
+            return (f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>")

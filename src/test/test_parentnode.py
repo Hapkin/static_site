@@ -1,6 +1,5 @@
 import unittest
 from src.parentnode import ParentNode
-from src.htmlnode import HTMLNode
 from src.leafnode import LeafNode
 ''' ##INFO##
     def __init__(self, tag=None, value=None, children=None,props=None):
@@ -13,8 +12,8 @@ from src.leafnode import LeafNode
 class TestParentNode(unittest.TestCase):
     def test_properties_types(self):
         
-        node2 = HTMLNode("p", "Test", props={"style":"color:green"})
-        node3 = HTMLNode("li","my text")
+        node2 = LeafNode("p", "Test", props={"style":"color:green"})
+        node3 = LeafNode("li","my text")
         node4 = ParentNode("lo", [node3])
         
         node1 = ParentNode("a",[node2, node4], {"href":"https://www.google.be","target":"_blanc"})
@@ -22,7 +21,7 @@ class TestParentNode(unittest.TestCase):
         
         self.assertEqual(type(node1.tag), str)
         self.assertEqual(type(node1.children), list)
-        self.assertIsInstance(node1.children[0], HTMLNode) #(HTMLNode,ParentNode,LeafNode))
+        self.assertIsInstance(node1.children[0], LeafNode) #(HTMLNode,ParentNode,LeafNode))
         self.assertEqual(type(node1.props), dict)
 
 
@@ -40,47 +39,77 @@ class TestParentNode(unittest.TestCase):
             )
 
         print_test=node.to_html()
+        
         self.assertEqual(print_test, "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>")
 
-##########todo update to ParentNodes
+
     def test_properties(self):        
-        #node=HTMLNode(value="test")
-        node = HTMLNode("p", "Test", props={"style":"color:green"})
+        node = ParentNode("p", children=[LeafNode("b", "Bold text")], props={"style":"color:green"})
         self.assertEqual(node.tag, "p")
-        self.assertEqual(node.value, "Test")
-        self.assertEqual(node.children, None)
+        self.assertEqual(node.children, [LeafNode("b", "Bold text")])
         self.assertDictEqual(node.props, {"style": "color:green"})
 
-        node2 = HTMLNode("a","my_url",children=None, props={"href":"https://www.google.be","target":"_blanc"})
+        node2 = ParentNode("a",children=[node], props={"href":"https://www.google.be","target":"_blanc"})
         self.assertEqual(node2.tag, "a")
-        self.assertEqual(node2.value, "my_url")
-        self.assertEqual(node2.children, None)
+        self.assertEqual(node2.children, [node])
         self.assertDictEqual(node2.props, {"href":"https://www.google.be","target":"_blanc"})
 
-        node3 = HTMLNode(value="only text")
-        self.assertEqual(node3.value, "only text")
-    
-    def test_props_to_html(self):
-        node = HTMLNode("a","my_url",props={"href":"https://www.google.be"})
-        node2 = HTMLNode("a","my_url",props={"href":"https://www.google.be"})
-        #print(f"1-->{str(node)}")     
-        self.assertEqual(str(node),str(node2))
+        node3 = ParentNode("a",children=[node2], props={"href":"https://www.google.be","target":"_new"})
+        self.assertEqual(type(node3.children), list)
 
-    def test_reprint(self):
-        node = HTMLNode('a','my_url',props={'href':'https://www.google.be','target':'_blanc'})
-        excepted= "HTML: <a>\ntext-inside: 'my_url'\nProps:\n'href': 'https://www.google.be', 'target': '_blanc'"
-        self.assertEqual(repr(node),excepted)
- 
-          
-    def test_emptyHTMLNode(self):
-        node=HTMLNode()
-        node2=HTMLNode()
-        self.assertEqual(node,node2)
-        
-    def test_html_node_equality_different_tags(self):
-        node1 = HTMLNode("p", "text")
-        node2 = HTMLNode("div", "text")
-        self.assertNotEqual(node1, node2)
+    
+    def test_to_html(self):
+        node = ParentNode("p", children=[LeafNode("b", "Bold text")], props={"style":"color:green"})
+        self.assertEqual(node.tag, "p")
+        self.assertEqual(node.children, [LeafNode("b", "Bold text")])
+        self.assertEqual(node.to_html(),'<p style="color:green"><b>Bold text</b></p>')
+
+        node2 = ParentNode("h1",children=[node], props={"href":"https://www.google.be","target":"_blanc"})
+        self.assertEqual(node2.tag, "h1")
+        self.assertEqual(node2.children, [node])
+        self.assertEqual(node2.props, {"href":"https://www.google.be","target":"_blanc"})
+        self.assertEqual(node2.to_html(),'<h1 href="https://www.google.be" target="_blanc"><p style="color:green"><b>Bold text</b></p></h1>')
+
+        node3 = ParentNode("a",children=[node2], props={"href":"https://www.google.be","target":"_new"})
+        self.assertEqual(type(node3.children), list)
+        self.assertEqual(node3.to_html(),'<a href="https://www.google.be" target="_new"><h1 href="https://www.google.be" target="_blanc"><p style="color:green"><b>Bold text</b></p></h1></a>')
+
+    def test_to_html_raises_missing_tag(self):
+        node = ParentNode(None, [LeafNode("em", "text")])
+        with self.assertRaises(ValueError):
+            node.to_html()
+
+    def test_empty_children_list(self):
+        with self.assertRaises(ValueError):
+            ParentNode("div", []).to_html()
+    
+    def test_invalid_children_type(self):
+        node=ParentNode("div", LeafNode("b", "Bold text"))  # Not in a list
+        with self.assertRaises(ValueError):
+            node.to_html()
+
+    def test_to_html_raises_missing_children(self):
+        node = ParentNode("div", None)
+        with self.assertRaises(ValueError):
+            node.to_html()
+
+    def test_to_html_raises_empty_children(self):
+        node = ParentNode("div", [])
+        with self.assertRaises(ValueError):
+            node.to_html()
+    
+    def test_children_must_be_list(self):
+        node = ParentNode("ul", LeafNode("li", "not in a list"))
+        with self.assertRaises(ValueError):
+            node.to_html()
+
+    def test_props_render_to_html(self):
+        node = ParentNode("a", [LeafNode(None, "click me")], props={"href": "boot.dev"})
+        html = node.to_html()
+        self.assertIn('href="boot.dev"', html)
+        self.assertTrue(html.startswith("<a "))
+
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
