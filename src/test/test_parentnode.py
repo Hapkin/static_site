@@ -1,6 +1,7 @@
 import unittest
-from src.parentnode import ParentNode
-from src.leafnode import LeafNode
+
+from src.leafnode import LeafNode, ParentNode
+
 ''' ##INFO##
     def __init__(self, tag=None, value=None, children=None,props=None):
         self.tag=tag                #string <a>
@@ -8,7 +9,6 @@ from src.leafnode import LeafNode
         self.children=children    #list of HTMLNode []
         self.props=props            #dictionary {"href": "www.google.com"}
 '''
-
 class TestParentNode(unittest.TestCase):
     def test_properties_types(self):
         
@@ -24,19 +24,16 @@ class TestParentNode(unittest.TestCase):
         self.assertIsInstance(node1.children[0], LeafNode) #(HTMLNode,ParentNode,LeafNode))
         self.assertEqual(type(node1.props), dict)
 
-
-########not working yet
-
     def test_L5parentNode(self):
         node = ParentNode(
                 "p",
-                [
-                LeafNode("b", "Bold text"),
-                LeafNode(None, "Normal text"),
-                LeafNode("i", "italic text"),
-                LeafNode(None, "Normal text"),
-                ],
-            )
+                    [
+                    LeafNode("b", "Bold text"),
+                    LeafNode(None, "Normal text"),
+                    LeafNode("i", "italic text"),
+                    LeafNode(None, "Normal text"),
+                    ],
+                )
 
         print_test=node.to_html()
         
@@ -110,6 +107,6 @@ class TestParentNode(unittest.TestCase):
         self.assertTrue(html.startswith("<a "))
 
 
-
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+

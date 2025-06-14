@@ -1,6 +1,5 @@
-from src.leafnode import LeafNode
-from src.parentnode import ParentNode
-from src.handeler import text_node_to_html_node
+from src.leafnode import LeafNode, ParentNode
+from src.handeler import text_node_to_html_node, split_nodes_delimiter
 from src.textnode import TextNode, TextType
 
 def main():
@@ -9,15 +8,16 @@ def main():
         #print("hello from main")
         #testing_leaf()
         #testing_parent()
-        test_TEXTNode()
+        #test_TEXTNode()
         #print("fool")
+        test_split_nodes_delimiter()
 
 
     except Exception as e:
         print(f"Error occurred: {e}")
         print(f"Error type: {type(e).__name__}")
-        import traceback
-        traceback.print_exc()
+  #      import traceback
+ #       traceback.print_exc()
 
 def testing_leaf():
         # Test your LeafNode here
@@ -51,6 +51,29 @@ def test_TEXTNode():
     html_node = text_node_to_html_node(node)
     print(html_node)
 
+def test_split_nodes_delimiter():
+     #text=[ TextNode( '**This** is text with a **bolded phrase** in the middle', TextType.TEXT)] 
+          
+     
+    text=[
+          TextNode("**start** bold text", TextType.TEXT),
+          TextNode("why so serious **END**", TextType.TEXT),
+          TextNode("how about **the middle** of the sentence", TextType.TEXT)
+          ]
+    test=[
+            TextNode("_start_ bold _text_",TextType.TEXT),
+            TextNode("why _so_ _serious_ **END**",TextType.TEXT),
+        ]
+    #result=split_nodes_delimiter(test,"_", TextType.ITALIC)
+    #print(result)
+     
+    delimiter = "**"
+    text_type= TextType.CODE
+    result= split_nodes_delimiter(text, delimiter, TextType.BOLD)
+    print(result)
+    #for item in result:
+    #     print(type(item))
+    #     print(f"{item}\n")
 
 #if __name__ == "__main__":
 main()

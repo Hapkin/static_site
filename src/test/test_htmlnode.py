@@ -1,3 +1,35 @@
+import unittest
+from src.leafnode import LeafNode, ParentNode
+
+### ABSTRACT CLASS so you need to use children to perform tests...
+
+class TestHtmlNodeStrRepr(unittest.TestCase):
+    def test_leafnode_str_repr_safe(self):
+        leaf = LeafNode(tag="span", value="Leaf", props={})
+        # Ensure str and repr do not throw RecursionError (or anything)
+        try:
+            s = str(leaf)
+            r = repr(leaf)
+        except RecursionError:
+            self.fail("RecursionError in __str__ or __repr__ with LeafNode")
+        except Exception as e:
+            self.fail(f"Unexpected error in __str__ or __repr__: {e}")
+        self.assertIsInstance(s, str)
+        self.assertIsInstance(r, str)
+    
+    def test_parentnode_str_repr_safe(self):
+        child = LeafNode(tag="span", value="Child", props={})
+        parent = ParentNode(tag="div", children=[child], props={})
+        
+        try:
+            s = str(parent)
+            r = repr(parent)
+        except RecursionError:
+            self.fail("RecursionError in __str__ or __repr__ with ParentNode")
+        except Exception as e:
+            self.fail(f"Unexpected error in __str__ or __repr__: {e}")
+        self.assertIsInstance(s, str)
+        self.assertIsInstance(r, str)
 
 ''' 
 BECAME OBSOLETE AS HTMLNODE IS NOW ABSTRACT

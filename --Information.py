@@ -2,7 +2,7 @@
 # child.to_html() will call the right occurrence as it is or a parent and will call it again or a leaf and then only return the string
 #ABC makes sure you can't make an HTMLNode()
 
-
+'''
 from abc import ABC, abstractmethod
 
 #ABC =  abstract base class => it doesn't allow HTMLNodes to be created
@@ -20,4 +20,4 @@ class ParentNode(HTMLNode):
         children_html = ''.join(child.to_html() for child in self.children)
         return f"<{self.tag}>{children_html}</{self.tag}>"
 
-
+'''
