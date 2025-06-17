@@ -14,7 +14,10 @@ class TextType(Enum):
 class TextNode():
     def __init__(self, text, text_type, url=None):
         self.text = text
-        self.text_type= text_type #member of TEXT_TYPE enum
+        if isinstance(text_type, TextType):
+            self.text_type= text_type #member of TEXT_TYPE enum
+        else:
+            raise ValueError(f"{text_type} != TextType.* :Raised in class(TextNode)")
         self.url = url
     
     def __eq__(self, other):

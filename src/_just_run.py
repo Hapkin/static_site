@@ -1,6 +1,7 @@
 from src.leafnode import LeafNode, ParentNode
-from src.handeler import text_node_to_html_node, split_nodes_delimiter
+from src.handeler import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images,extract_markdown_links,split_nodes_image, split_nodes_link
 from src.textnode import TextNode, TextType
+import sys
 
 def main():
     try:
@@ -10,8 +11,39 @@ def main():
         #testing_parent()
         #test_TEXTNode()
         #print("fool")
-        test_split_nodes_delimiter()
+        #test_split_nodes_delimiter()
+        # Test with the absolute simplest case first
+        
+        simple_text = TextNode("This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",TextType.TEXT)
+        print("=== SIMPLE TEST ===")
+        #print(extract_markdown_links(simple_text))
+        result=split_nodes_link([simple_text])
+        print(f"\n=========\n {result}") 
 
+
+        print("\n=== COMPLEX TEST ===") 
+        # Then test with your complex text
+        node = TextNode("This is text with a link ![to boot dev](https://www.boot.dev) and ![to youtube](https://www.youtube.com/@bootdotdev) " \
+            "![rick roll](https://i.imgur.com/aKaOqIh.gif)" \
+            " and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)" \
+            " and ![abi (https://i.jpeg)", \
+            TextType.TEXT)
+        #node = TextNode("This is text with a link ![to boot dev](https://www.boot.dev)", TextType.TEXT)        
+        #node2 = TextNode("![to boot dev](https://www.boot.dev)![to boot dev](https://www.boot.dev)![to boot dev](https://www.boot.dev)", TextType.TEXT)        
+        #node3 = TextNode("![to boot dev](https://www.boot.dev)", TextType.TEXT)        
+        #node4 = TextNode("![to boot dev](https://www.boot.dev)This is text with a link [to boot dev](https://www.boot.dev)", TextType.TEXT)        
+        #node5 = TextNode("", TextType.TEXT)        
+        #node6 = TextNode("This is text ![to boot dev](https://www.boot.dev) with a link ", TextType.TEXT)        
+        #node7 = TextNode("![to boot dev](https://www.boot.dev) This is text with a link ", TextType.TEXT)        
+        
+        #print(extract_markdown_images(node.text))
+        #print(extract_markdown_images("This is text with a link ![to boot dev](https://www.boot.dev) and ![to youtube](https://www.youtube.com/@bootdotdev)"))
+        #print(extract_markdown_links(text))
+        #sys.exit()
+        #result=split_nodes_image([node,node2,node3,node4,node5,node6,node7])
+        result=split_nodes_image([node])
+        print(f"\n=========\n {result}")   
+        
 
     except Exception as e:
         print(f"Error occurred: {e}")

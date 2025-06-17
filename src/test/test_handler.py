@@ -1,8 +1,9 @@
 import unittest
-from src.handeler import text_node_to_html_node, split_nodes_delimiter
+import inspect
+from src.handeler import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
 from src.textnode import TextNode, TextType
 from src.leafnode import LeafNode
-'''
+'''  27 tests
 class TextType(Enum):    
     TEXT = "text"       #"Normal text"
     BOLD = "bold"       #"**Bold text**"
@@ -12,8 +13,9 @@ class TextType(Enum):
     IMAGE = "image"     #"![alt text](url)"
 '''
 
-#handeler function
+#handeler text_node_to_html_node() 6 test
 class TestTextNodeToHtmlNode(unittest.TestCase):
+    print("DEBUG: TestSplitNodesLink class loaded")
     def test_valid_text_type_returns_leafnode(self):
         text_node = TextNode("Bold bears!", TextType.BOLD)
         html_node = text_node_to_html_node(text_node)
@@ -53,14 +55,6 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
         self.assertEqual(html_node.value, "Go bears!")
         self.assertDictEqual(html_node.props, {"href":"http://whatever.com"})
 
-    def test_invalid_text_type_raises(self):
-        class FakeType:
-            pass
-        text_node = TextNode("Mystery", FakeType())
-        with self.assertRaises(ValueError) as context:
-            text_node_to_html_node(text_node)
-        self.assertIn("is not a valid TextType", str(context.exception))
-
     def test_plain_text_makes_leafnode_with_no_tag(self):
         text_node = TextNode("Just text", TextType.TEXT)
         html_node = text_node_to_html_node(text_node)
@@ -69,8 +63,9 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
 
 
 
-#handeler function
+#handeler split_nodes_delimiter() 4 test
 class Test_split_nodes_delimiter(unittest.TestCase):
+    print("DEBUG: Test_split_nodes_delimiter class loaded")
     def test_bold_locations(self):    
         test=[
             TextNode("**start** bold text",TextType.TEXT),
@@ -117,7 +112,7 @@ class Test_split_nodes_delimiter(unittest.TestCase):
             TextNode(' in the middle', TextType.TEXT)
             ]
         self.assertEqual(result,expected)
-'''
+
     def test_multinodes(self):
         node=[
             TextNode("Alpha `code` Omega", TextType.TEXT),
@@ -131,4 +126,203 @@ class Test_split_nodes_delimiter(unittest.TestCase):
             TextNode("Edge at start: `begin` middle end.", TextType.TEXT),
             TextNode("At the end comes _finale_", TextType.TEXT),
         ]
-'''
+        #BOLD
+        result=split_nodes_delimiter(node,"**", TextType.BOLD)
+        expected=[TextNode('Alpha `code` Omega', TextType.TEXT), TextNode('Bolded phrase', TextType.BOLD), TextNode(' at start.', TextType.TEXT), TextNode('A little _italic_ sprinkled in.', TextType.TEXT), TextNode('Plain beginning then ', TextType.TEXT), TextNode('bold', TextType.BOLD), TextNode('.', TextType.TEXT), TextNode('Multiple `bits` of `code` blocks.', TextType.TEXT), TextNode('_Italics_ everywhere _here_!', TextType.TEXT), TextNode('Ends with bold ', TextType.TEXT), TextNode('emphasis', TextType.BOLD), TextNode('No formatting present at all.', TextType.TEXT), TextNode('Edge at start: `begin` middle end.', TextType.TEXT), TextNode('At the end comes _finale_', TextType.TEXT)]
+        self.assertEqual(result,expected)
+        #CODE
+        result=split_nodes_delimiter(node,"`", TextType.CODE)
+        expected=[TextNode('Alpha ', TextType.TEXT), TextNode('code', TextType.CODE), TextNode(' Omega', TextType.TEXT), TextNode('**Bolded phrase** at start.', TextType.TEXT), TextNode('A little _italic_ sprinkled in.', TextType.TEXT), TextNode('Plain beginning then **bold**.', TextType.TEXT), TextNode('Multiple ', TextType.TEXT), TextNode('bits', TextType.CODE), TextNode(' of ', TextType.TEXT), TextNode('code', TextType.CODE), TextNode(' blocks.', TextType.TEXT), TextNode('_Italics_ everywhere _here_!', TextType.TEXT), TextNode('Ends with bold **emphasis**', TextType.TEXT), TextNode('No formatting present at all.', TextType.TEXT), TextNode('Edge at start: ', TextType.TEXT), TextNode('begin', TextType.CODE), TextNode(' middle end.', TextType.TEXT), TextNode('At the end comes _finale_', TextType.TEXT)]
+        self.assertEqual(result,expected)
+        #ITALIC
+        result=split_nodes_delimiter(node,"_", TextType.ITALIC)
+        expected=[TextNode('Alpha `code` Omega', TextType.TEXT), TextNode('**Bolded phrase** at start.', TextType.TEXT), TextNode('A little ', TextType.TEXT), TextNode('italic', TextType.ITALIC), TextNode(' sprinkled in.', TextType.TEXT), TextNode('Plain beginning then **bold**.', TextType.TEXT), TextNode('Multiple `bits` of `code` blocks.', TextType.TEXT), TextNode('Italics', TextType.ITALIC), TextNode(' everywhere ', TextType.TEXT), TextNode('here', TextType.ITALIC), TextNode('!', TextType.TEXT), TextNode('Ends with bold **emphasis**', TextType.TEXT), TextNode('No formatting present at all.', TextType.TEXT), TextNode('Edge at start: `begin` middle end.', TextType.TEXT), TextNode('At the end comes ', TextType.TEXT), TextNode('finale', TextType.ITALIC)]
+        self.assertEqual(result,expected)
+
+#test extract_markdown_images() 1 test
+class test_extract_markdown_images(unittest.TestCase):
+    print("DEBUG: test_extract_markdown_images class loaded")
+    #handeler function extract_markdown_images()
+    def test_largetext_with_imbigue(self):
+        text = "This is text with a " \
+            "![rick roll](https://i.imgur.com/aK.gif)" \
+            " and ![obi wan](https://i.imgur.com/Vk.jpeg)" \
+            " and ![abi (https://i.jpeg)" \
+            " and ![q](https://i."
+        
+        # Only expect the 2 valid matches!
+        expected = [
+            ('rick roll', 'https://i.imgur.com/aK.gif'), 
+            ('obi wan', 'https://i.imgur.com/Vk.jpeg')
+        ]
+        result = extract_markdown_images(text)
+        self.assertEqual(expected, result)
+
+#test extract_markdown_links() 2 test
+class test_extract_markdown_links(unittest.TestCase):
+    print("DEBUG: test_extract_markdown_links class loaded")
+    def test_simple_links(self):
+        simple_text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev"
+        result=extract_markdown_links(simple_text)
+        expected=[('to boot dev', 'https://www.boot.dev')]
+        self.assertEqual(expected, result)
+    
+    def test_complex_links(self):
+        large_text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev) " \
+            "[rick roll](https://i.imgur.com/aKaOqIh.gif)" \
+            " and [obi wan](https://i.imgur.com/fJRm4Vk.jpeg)" \
+            " and [abi (https://i.jpeg)" \
+            ""
+        result=extract_markdown_links(large_text)
+        expected=[('to boot dev', 'https://www.boot.dev'), ('to youtube', 'https://www.youtube.com/@bootdotdev'), ('rick roll', 'https://i.imgur.com/aKaOqIh.gif'), ('obi wan', 'https://i.imgur.com/fJRm4Vk.jpeg')]
+        self.assertEqual(expected, result)
+
+#test split_nodes_image() 7 test
+class test_split_nodes_image(unittest.TestCase):
+    print("DEBUG: test_split_nodes_image class loaded")
+    def test_simple_test(self):
+        simple_text = TextNode("This is text with a link ![to boot dev](https://www.boot.dev) and ![to youtube](https://www.youtube.com/@bootdotdev)",TextType.TEXT)
+        result=split_nodes_image([simple_text])
+        expected=[TextNode('This is text with a link ', TextType.TEXT), 
+                  TextNode('to boot dev', TextType.IMAGE, 'https://www.boot.dev'), 
+                  TextNode(' and ', TextType.TEXT), 
+                  TextNode('to youtube', TextType.IMAGE, 'https://www.youtube.com/@bootdotdev')
+                  ]
+        self.assertEqual(expected, result)
+
+
+    def test_complex_test(self):
+        node = TextNode("This is text with a link ![to boot dev](https://www.boot.dev) and ![to youtube](https://www.youtube.com/@bootdotdev) " \
+            "![rick roll](https://i.imgur.com/aKaOqIh.gif)" \
+            " and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)" \
+            " and ![abi (https://i.jpeg)", \
+            TextType.TEXT)        
+        result=split_nodes_image([node])
+        expected=[TextNode('This is text with a link ', TextType.TEXT), 
+                  TextNode('to boot dev', TextType.IMAGE, 'https://www.boot.dev'), 
+                  TextNode(' and ', TextType.TEXT), 
+                 TextNode('to youtube', TextType.IMAGE, 'https://www.youtube.com/@bootdotdev'), 
+                 TextNode('rick roll', TextType.IMAGE, 'https://i.imgur.com/aKaOqIh.gif'), 
+                 TextNode(' and ', TextType.TEXT), 
+                 TextNode('obi wan', TextType.IMAGE, 'https://i.imgur.com/fJRm4Vk.jpeg'), 
+                 TextNode(' and ![abi (https://i.jpeg)', TextType.TEXT)
+                 ]
+        self.assertEqual(expected, result)
+    
+    def test_invalid_node_type(self):
+        # Pass in something that's not a TextNode
+        invalid_nodes = ["not a TextNode", 123, None]
+        with self.assertRaises(ValueError):
+            split_nodes_image(invalid_nodes)
+
+    
+
+    def test_raises_on_none(self):
+        with self.assertRaises(ValueError):
+            split_nodes_image(None)
+
+    def test_invalid_node_type2(self):
+        invalid_nodes = [ ]
+        self.assertRaises(ValueError, split_nodes_image, invalid_nodes)
+    def test_invalid_node_type3(self):
+        invalid_nodes = ""
+        self.assertRaises(ValueError, split_nodes_image, invalid_nodes)
+
+    def test_complex_list_nodes(self):
+        node = TextNode("This is text with a link [to boot dev](https://www.boot.dev)", TextType.TEXT)        
+        node2 = TextNode("[to boot dev](https://www.boot.dev)[to boot dev](https://www.boot.dev)[to boot dev](https://www.boot.dev)", TextType.TEXT)        
+        node3 = TextNode("[to boot dev](https://www.boot.dev)", TextType.TEXT)        
+        node4 = TextNode("[to boot dev](https://www.boot.dev)This is text with a link [to boot dev](https://www.boot.dev)", TextType.TEXT)        
+        node5 = TextNode("", TextType.TEXT)        
+        node6 = TextNode("This is text [to boot dev](https://www.boot.dev) with a link ", TextType.TEXT)        
+        node7 = TextNode("[to boot dev](https://www.boot.dev) This is text with a link ", TextType.TEXT)   
+        expected=[TextNode('This is text with a link ', TextType.TEXT), 
+                  TextNode('to boot dev', TextType.LINK, 'https://www.boot.dev'), 
+                  TextNode('to boot dev', TextType.LINK, 'https://www.boot.dev'), 
+                  TextNode('to boot dev', TextType.LINK, 'https://www.boot.dev'), 
+                  TextNode('to boot dev', TextType.LINK, 'https://www.boot.dev'), 
+                  TextNode('to boot dev', TextType.LINK, 'https://www.boot.dev'), 
+                  TextNode('to boot dev', TextType.LINK, 'https://www.boot.dev'), 
+                  TextNode('This is text with a link ', TextType.TEXT), 
+                  TextNode('to boot dev', TextType.LINK, 'https://www.boot.dev'), 
+                  TextNode('This is text ', TextType.TEXT), 
+                  TextNode('to boot dev', TextType.LINK, 'https://www.boot.dev'), 
+                  TextNode(' with a link ', TextType.TEXT), 
+                  TextNode('to boot dev', TextType.LINK, 'https://www.boot.dev'), 
+                  TextNode(' This is text with a link ', TextType.TEXT)]
+        result=split_nodes_link([node,node2,node3,node4,node5,node6,node7])
+        self.assertListEqual(expected, result)
+
+
+#test split_nodes_link() 7 tests
+class test_split_nodes_link(unittest.TestCase):
+    print("DEBUG: test_split_nodes_link class loaded")
+    def test_simple_test(self):
+        node = TextNode("This is text with a link ![to boot dev](https://www.boot.dev) and ![to youtube](https://www.youtube.com/@bootdotdev)",TextType.TEXT)
+        result=split_nodes_image([node])
+        expected=[TextNode('This is text with a link ', TextType.TEXT), 
+                  TextNode('to boot dev', TextType.IMAGE, 'https://www.boot.dev'), 
+                  TextNode(' and ', TextType.TEXT), 
+                  TextNode('to youtube', TextType.IMAGE, 'https://www.youtube.com/@bootdotdev')
+                  ]
+        self.assertListEqual(expected, result)
+
+    def test_complex_test(self):
+        node = TextNode("This is text with a link ![to boot dev](https://www.boot.dev) and ![to youtube](https://www.youtube.com/@bootdotdev) " \
+            "![rick roll](https://i.imgur.com/aKaOqIh.gif)" \
+            " and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)" \
+            " and ![abi (https://i.jpeg)", \
+            TextType.TEXT)  
+        result=split_nodes_image([node])
+        expected=[TextNode('This is text with a link ', TextType.TEXT), 
+                TextNode('to boot dev', TextType.IMAGE, 'https://www.boot.dev'), 
+                TextNode(' and ', TextType.TEXT), 
+                TextNode('to youtube', TextType.IMAGE, 'https://www.youtube.com/@bootdotdev'), 
+                TextNode('rick roll', TextType.IMAGE, 'https://i.imgur.com/aKaOqIh.gif'), 
+                TextNode(' and ', TextType.TEXT), 
+                TextNode('obi wan', TextType.IMAGE, 'https://i.imgur.com/fJRm4Vk.jpeg'), 
+                TextNode(' and ![abi (https://i.jpeg)', TextType.TEXT)]
+        self.assertListEqual(expected, result)
+
+    def test_invalid_node_type(self):
+        # Pass in something that's not a TextNode
+        invalid_nodes = ["not a TextNode", 123, None]
+        with self.assertRaises(ValueError):
+            split_nodes_image(invalid_nodes)
+    
+
+    def test_raises_on_none(self):
+        with self.assertRaises(ValueError):
+            split_nodes_image(None)
+
+    def test_invalid_node_type2(self):
+        invalid_nodes = [ ]
+        self.assertRaises(ValueError, split_nodes_image, invalid_nodes)
+    def test_invalid_node_type3(self):
+        invalid_nodes = ""
+        self.assertRaises(ValueError, split_nodes_image, invalid_nodes)
+
+    def test_complex_list_nodes(self):
+        node = TextNode("This is text with a link ![to boot dev](https://www.boot.dev)", TextType.TEXT)        
+        node2 = TextNode("![to boot dev](https://www.boot.dev)![to boot dev](https://www.boot.dev)![to boot dev](https://www.boot.dev)", TextType.TEXT)        
+        node3 = TextNode("![to boot dev](https://www.boot.dev)", TextType.TEXT)        
+        node4 = TextNode("![to boot dev](https://www.boot.dev)This is text with a link ![to boot dev](https://www.boot.dev)", TextType.TEXT)        
+        node5 = TextNode("", TextType.TEXT)        
+        node6 = TextNode("This is text ![to boot dev](https://www.boot.dev) with a link ", TextType.TEXT)        
+        node7 = TextNode("![to boot dev](https://www.boot.dev) This is text with a link ", TextType.TEXT)   
+        expected=[TextNode('This is text with a link ', TextType.TEXT), 
+                  TextNode('to boot dev', TextType.IMAGE, 'https://www.boot.dev'), 
+                  TextNode('to boot dev', TextType.IMAGE, 'https://www.boot.dev'), 
+                  TextNode('to boot dev', TextType.IMAGE, 'https://www.boot.dev'),
+                  TextNode('to boot dev', TextType.IMAGE, 'https://www.boot.dev'), 
+                  TextNode('to boot dev', TextType.IMAGE, 'https://www.boot.dev'), 
+                  TextNode('to boot dev', TextType.IMAGE, 'https://www.boot.dev'), 
+                  TextNode('This is text with a link ', TextType.TEXT), 
+                  TextNode('to boot dev', TextType.IMAGE, 'https://www.boot.dev'), 
+                  TextNode('This is text ', TextType.TEXT), 
+                  TextNode('to boot dev', TextType.IMAGE, 'https://www.boot.dev'), 
+                  TextNode(' with a link ', TextType.TEXT), 
+                  TextNode('to boot dev', TextType.IMAGE, 'https://www.boot.dev'), 
+                  TextNode(' This is text with a link ', TextType.TEXT)]
+        result=split_nodes_image([node,node2,node3,node4,node5,node6,node7])
+        self.assertListEqual(expected, result)

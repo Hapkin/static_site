@@ -2,7 +2,7 @@ import re
 from src.textnode import TextNode, TextType
 from src.leafnode import LeafNode
 import sys
-sys.setrecursionlimit(25)
+sys.setrecursionlimit(50)
 
 
 
@@ -26,26 +26,9 @@ def text_node_to_html_node(text_node):
             raise ValueError(f"Error:{text_node.text_type} is not a valid TextType?.?")
         
 
-'''
-node = TextNode("This is text with a `code block` word", TextType.TEXT)
-new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
-[
-    TextNode("This is text with a ", TextType.TEXT),
-    TextNode("code block", TextType.CODE),
-    TextNode(" word", TextType.TEXT),
-
-    class TextType(Enum):    
-    TEXT = "text"       #"Normal text"
-    BOLD = "bold"       #"**Bold text**"
-    ITALIC = "italic"   #"_Italic text_"
-    CODE = "code"       #"`Code text`"
-    LINK = "link"       #"[anchor text](url)"
-    IMAGE = "image"     #"![alt text](url)"
-]'''
-
 
 #moeten eerst TextNodes worden daarma .text_node_to_html_node()
-#old nodes zijn textnodes!!
+#old nodes zijn textnodes!! []
 def split_nodes_delimiter(old_nodes, delimiter, texttype):
     list_new_nodes=[]
     len_delimiter=len(delimiter)
@@ -95,3 +78,110 @@ def split_nodes_delimiter(old_nodes, delimiter, texttype):
             list_new_nodes.extend(split_nodes_delimiter([new_textnode],delimiter, texttype))
             
     return list_new_nodes
+
+#[to boot dev](https://www.boot.dev)
+def extract_markdown_links(text):
+    pattern = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)"
+    matches = re.findall(pattern, text)
+    return matches
+
+#![image](https://i.imgur.com/zjjcJKZ.png)
+def extract_markdown_images(text):
+    pattern = r"!\[([^\]]*)\]\(([^\)]*)\)"
+    matches = re.findall(pattern, text)
+    return matches
+
+r'''  WITH MORE DEBUGGING!!
+def extract_markdown_images(text):
+    print("Function called with text:", text[:50], "...")  # Debug line
+    try:
+        import re
+        print("re module imported successfully")  # Debug line
+        pattern = r"!\[([^\]]*)\]\(([^\)]*)\)"
+        print("Pattern created:", pattern)  # Debug line
+        matches = re.findall(pattern, text)
+        print("Matches found:", matches)  # Debug line
+        return matches
+    except Exception as e:
+        print("Error occurred:", e)
+        raise
+'''
+
+def split_nodes_image(old_nodes):
+    new_nodes = []
+    if isinstance(old_nodes, list):
+        if not old_nodes:
+            raise ValueError(f"oldnodes: no items in {old_nodes}...")
+    else:
+        raise ValueError(f"oldnodes: this is not a list of nodes {old_nodes}...")
+    for node in old_nodes:
+        if not isinstance(node, TextNode):
+            raise ValueError("oldnodes: this is not a TextNode")
+        #convert text ![]() => ImageNode
+        
+        images=extract_markdown_images(node.text)
+        #if there is no result there are no valid image tags in this node!
+        if not (images):
+            if node.text.strip():  # Only append if text is not empty/whitespace
+                new_nodes.append(TextNode(node.text,TextType.TEXT))
+            continue
+
+        left_over=node.text.split("![",1)
+        #check if text starts with an image
+        if(len(left_over[0])==0):
+            new_nodes.append(TextNode(images[0][0],TextType.IMAGE,images[0][1]))
+            
+            removed_image=left_over[1].split(")",1)
+            if(len(removed_image[1])>2):
+                next_string=f"{removed_image[1]}"
+            else:
+                continue
+        else:
+            if left_over[0].strip():  # Only append if text is not empty/whitespace
+                new_nodes.append(TextNode(left_over[0],TextType.TEXT))
+            if(len(left_over)==2):
+                next_string=f"![{left_over[1]}"
+        new_nodes.extend(split_nodes_image([TextNode(next_string,TextType.TEXT)]))
+        
+    return new_nodes
+
+
+
+def split_nodes_link(old_nodes):
+    new_nodes = []
+    if isinstance(old_nodes, list):
+        if not old_nodes:
+            raise ValueError(f"oldnodes: no items in {old_nodes}...")
+    else:
+        raise ValueError(f"oldnodes: this is not a list of nodes {old_nodes}...")
+    for node in old_nodes:
+        #print(f"Processing node: {node.text[:50]}...")
+        if not isinstance(node, TextNode):
+            raise ValueError("oldnodes: this is not a TextNode")
+        #convert text []() => TextType.LINK
+        
+        images=extract_markdown_links(node.text)
+        #if there is no result there are no valid image tags in this node!
+        if not (images):
+            if node.text.strip():  # Only append if text is not empty/whitespace
+                new_nodes.append(TextNode(node.text, TextType.TEXT))
+            #print(f"images left? :: {images}")
+            continue
+
+        left_over=node.text.split("[",1)
+        #check if text starts with an image
+        if(len(left_over[0])==0):
+            new_nodes.append(TextNode(images[0][0],TextType.LINK,images[0][1]))
+            removed_image=left_over[1].split(")",1)
+            if(len(removed_image[1])>2):
+                next_string=f"{removed_image[1]}"
+            else:
+                continue
+        else:
+            if node.text.strip():  # Only append if text is not empty/whitespace
+                new_nodes.append(TextNode(left_over[0],TextType.TEXT))
+            if(len(left_over)==2):
+                next_string=f"[{left_over[1]}"
+        new_nodes.extend(split_nodes_link([TextNode(next_string,TextType.TEXT)]))
+        
+    return new_nodes

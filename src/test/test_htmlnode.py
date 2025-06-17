@@ -1,10 +1,13 @@
 import unittest
+import inspect
 from src.leafnode import LeafNode, ParentNode
 
 ### ABSTRACT CLASS so you need to use children to perform tests...
+# 2 test
 
-class TestHtmlNodeStrRepr(unittest.TestCase):
-    def test_leafnode_str_repr_safe(self):
+class TestHtmlNodeStrRepr2(unittest.TestCase):
+    print("DEBUG: TestHtmlNodeStrRepr2 class loaded")
+    def test_leafnode_str_repr(self):
         leaf = LeafNode(tag="span", value="Leaf", props={})
         # Ensure str and repr do not throw RecursionError (or anything)
         try:
@@ -17,7 +20,8 @@ class TestHtmlNodeStrRepr(unittest.TestCase):
         self.assertIsInstance(s, str)
         self.assertIsInstance(r, str)
     
-    def test_parentnode_str_repr_safe(self):
+    def test_parentnode_str_repr(self):
+
         child = LeafNode(tag="span", value="Child", props={})
         parent = ParentNode(tag="div", children=[child], props={})
         
@@ -30,7 +34,6 @@ class TestHtmlNodeStrRepr(unittest.TestCase):
             self.fail(f"Unexpected error in __str__ or __repr__: {e}")
         self.assertIsInstance(s, str)
         self.assertIsInstance(r, str)
-
 ''' 
 BECAME OBSOLETE AS HTMLNODE IS NOW ABSTRACT
 no instance of HTMLNode can be created

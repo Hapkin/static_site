@@ -1,8 +1,8 @@
 import unittest
-
+import inspect
 from src.leafnode import LeafNode, ParentNode
 
-''' ##INFO##
+''' ##INFO##  11 tests
     def __init__(self, tag=None, value=None, children=None,props=None):
         self.tag=tag                #string <a>
         self.value=value            #string the text inside a <p>paragraph</p>
@@ -10,7 +10,8 @@ from src.leafnode import LeafNode, ParentNode
         self.props=props            #dictionary {"href": "www.google.com"}
 '''
 class TestParentNode(unittest.TestCase):
-    def test_properties_types(self):
+    print("DEBUG: TestParentNode class loaded")
+    def test_properties_types_parent(self):
         
         node2 = LeafNode("p", "Test", props={"style":"color:green"})
         node3 = LeafNode("li","my text")
