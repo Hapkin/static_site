@@ -1,5 +1,5 @@
 from src.leafnode import LeafNode, ParentNode
-from src.handeler import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images,extract_markdown_links,split_nodes_image, split_nodes_link
+from src.handeler import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images,extract_markdown_links,split_nodes_image, split_nodes_link, text_to_textnodes
 from src.textnode import TextNode, TextType
 import sys
 
@@ -13,43 +13,52 @@ def main():
         #print("fool")
         #test_split_nodes_delimiter()
         # Test with the absolute simplest case first
-        
-        simple_text = TextNode("This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",TextType.TEXT)
-        print("=== SIMPLE TEST ===")
-        #print(extract_markdown_links(simple_text))
-        result=split_nodes_link([simple_text])
-        print(f"\n=========\n {result}") 
-
-
-        print("\n=== COMPLEX TEST ===") 
-        # Then test with your complex text
-        node = TextNode("This is text with a link ![to boot dev](https://www.boot.dev) and ![to youtube](https://www.youtube.com/@bootdotdev) " \
-            "![rick roll](https://i.imgur.com/aKaOqIh.gif)" \
-            " and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)" \
-            " and ![abi (https://i.jpeg)", \
-            TextType.TEXT)
-        #node = TextNode("This is text with a link ![to boot dev](https://www.boot.dev)", TextType.TEXT)        
-        #node2 = TextNode("![to boot dev](https://www.boot.dev)![to boot dev](https://www.boot.dev)![to boot dev](https://www.boot.dev)", TextType.TEXT)        
-        #node3 = TextNode("![to boot dev](https://www.boot.dev)", TextType.TEXT)        
-        #node4 = TextNode("![to boot dev](https://www.boot.dev)This is text with a link [to boot dev](https://www.boot.dev)", TextType.TEXT)        
-        #node5 = TextNode("", TextType.TEXT)        
-        #node6 = TextNode("This is text ![to boot dev](https://www.boot.dev) with a link ", TextType.TEXT)        
-        #node7 = TextNode("![to boot dev](https://www.boot.dev) This is text with a link ", TextType.TEXT)        
-        
-        #print(extract_markdown_images(node.text))
-        #print(extract_markdown_images("This is text with a link ![to boot dev](https://www.boot.dev) and ![to youtube](https://www.youtube.com/@bootdotdev)"))
-        #print(extract_markdown_links(text))
-        #sys.exit()
-        #result=split_nodes_image([node,node2,node3,node4,node5,node6,node7])
-        result=split_nodes_image([node])
-        print(f"\n=========\n {result}")   
-        
+        #print(testing_split_nodes_image())
+        testing_text_to_textnodes()     
 
     except Exception as e:
         print(f"Error occurred: {e}")
         print(f"Error type: {type(e).__name__}")
   #      import traceback
  #       traceback.print_exc()
+
+def testing_text_to_textnodes():
+    pass
+    #text="This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+    text = "**bold**_italic_"
+    print(text_to_textnodes(text))
+
+
+def testing_split_nodes_image():
+    simple_text = TextNode("This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",TextType.TEXT)
+    print("=== SIMPLE TEST ===")
+    #print(extract_markdown_links(simple_text))
+    result=split_nodes_link([simple_text])
+    print(f"\n=========\n {result}") 
+
+
+    print("\n=== COMPLEX TEST ===") 
+    # Then test with your complex text
+    node = TextNode("This is text with a link ![to boot dev](https://www.boot.dev) and ![to youtube](https://www.youtube.com/@bootdotdev) " \
+        "![rick roll](https://i.imgur.com/aKaOqIh.gif)" \
+        " and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)" \
+        " and ![abi (https://i.jpeg)", \
+        TextType.TEXT)
+    #node = TextNode("This is text with a link ![to boot dev](https://www.boot.dev)", TextType.TEXT)        
+    #node2 = TextNode("![to boot dev](https://www.boot.dev)![to boot dev](https://www.boot.dev)![to boot dev](https://www.boot.dev)", TextType.TEXT)        
+    #node3 = TextNode("![to boot dev](https://www.boot.dev)", TextType.TEXT)        
+    #node4 = TextNode("![to boot dev](https://www.boot.dev)This is text with a link [to boot dev](https://www.boot.dev)", TextType.TEXT)        
+    #node5 = TextNode("", TextType.TEXT)        
+    #node6 = TextNode("This is text ![to boot dev](https://www.boot.dev) with a link ", TextType.TEXT)        
+    #node7 = TextNode("![to boot dev](https://www.boot.dev) This is text with a link ", TextType.TEXT)        
+    
+    #print(extract_markdown_images(node.text))
+    #print(extract_markdown_images("This is text with a link ![to boot dev](https://www.boot.dev) and ![to youtube](https://www.youtube.com/@bootdotdev)"))
+    #print(extract_markdown_links(text))
+    #sys.exit()
+    #result=split_nodes_image([node,node2,node3,node4,node5,node6,node7])
+    result=split_nodes_image([node])
+    return (f"\n=========\n {result}")
 
 def testing_leaf():
         # Test your LeafNode here

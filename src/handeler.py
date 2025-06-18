@@ -3,7 +3,17 @@ from src.textnode import TextNode, TextType
 from src.leafnode import LeafNode
 import sys
 sys.setrecursionlimit(50)
-
+#######
+'''
+def text_node_to_html_node(text_node):
+def split_nodes_delimiter(old_nodes, delimiter, texttype):
+def extract_markdown_links(text):
+def extract_markdown_images(text):
+def split_nodes_image(old_nodes):
+def split_nodes_link(old_nodes):
+def text_to_textnodes(text):
+'''
+#######
 
 
 def text_node_to_html_node(text_node):
@@ -123,7 +133,7 @@ def split_nodes_image(old_nodes):
         #if there is no result there are no valid image tags in this node!
         if not (images):
             if node.text.strip():  # Only append if text is not empty/whitespace
-                new_nodes.append(TextNode(node.text,TextType.TEXT))
+                new_nodes.append(node)
             continue
 
         left_over=node.text.split("![",1)
@@ -164,7 +174,7 @@ def split_nodes_link(old_nodes):
         #if there is no result there are no valid image tags in this node!
         if not (images):
             if node.text.strip():  # Only append if text is not empty/whitespace
-                new_nodes.append(TextNode(node.text, TextType.TEXT))
+                new_nodes.append(node)
             #print(f"images left? :: {images}")
             continue
 
@@ -185,3 +195,21 @@ def split_nodes_link(old_nodes):
         new_nodes.extend(split_nodes_link([TextNode(next_string,TextType.TEXT)]))
         
     return new_nodes
+
+
+
+
+def text_to_textnodes(text):
+    #This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)
+    if not type(text)==str :
+        raise ValueError(f"(text) should be a string: {text}")
+    
+    new_nodes_list = []
+    old_nodes = [TextNode(text, TextType.TEXT)]
+    new_nodes_list = split_nodes_delimiter(old_nodes, "**", TextType.BOLD)
+    new_nodes_list = split_nodes_delimiter(new_nodes_list, "_", TextType.ITALIC)
+    new_nodes_list = split_nodes_delimiter(new_nodes_list, "`", TextType.CODE)
+    new_nodes_list = split_nodes_link(new_nodes_list)
+    new_nodes_list = split_nodes_image(new_nodes_list)
+
+    return new_nodes_list
