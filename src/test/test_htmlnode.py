@@ -6,7 +6,7 @@ from src.leafnode import LeafNode, ParentNode
 # 2 test
 
 class TestHtmlNodeStrRepr2(unittest.TestCase):
-    print("DEBUG: TestHtmlNodeStrRepr2 class loaded")
+    #print("DEBUG: TestHtmlNodeStrRepr2 class loaded")
     def test_leafnode_str_repr(self):
         leaf = LeafNode(tag="span", value="Leaf", props={})
         # Ensure str and repr do not throw RecursionError (or anything)

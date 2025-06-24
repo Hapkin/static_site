@@ -213,3 +213,4 @@ def text_to_textnodes(text):
     new_nodes_list = split_nodes_image(new_nodes_list)
 
     return new_nodes_list
+

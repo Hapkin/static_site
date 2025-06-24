@@ -1,6 +1,7 @@
 import unittest
 import inspect
-from src.handeler import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
+from src.handeler_text import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
+
 from src.textnode import TextNode, TextType
 from src.leafnode import LeafNode
 '''  27 tests
@@ -15,7 +16,7 @@ class TextType(Enum):
 
 #handeler text_node_to_html_node() 6 test
 class TestTextNodeToHtmlNode(unittest.TestCase):
-    print("DEBUG: TestSplitNodesLink class loaded")
+    #print("DEBUG: TestSplitNodesLink class loaded")
     def test_valid_text_type_returns_leafnode(self):
         text_node = TextNode("Bold bears!", TextType.BOLD)
         html_node = text_node_to_html_node(text_node)
@@ -65,7 +66,7 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
 
 #handeler split_nodes_delimiter() 4 test
 class Test_split_nodes_delimiter(unittest.TestCase):
-    print("DEBUG: Test_split_nodes_delimiter class loaded")
+    #print("DEBUG: Test_split_nodes_delimiter class loaded")
     def test_bold_locations(self):    
         test=[
             TextNode("**start** bold text",TextType.TEXT),
@@ -141,7 +142,7 @@ class Test_split_nodes_delimiter(unittest.TestCase):
 
 #test extract_markdown_images() 1 test
 class test_extract_markdown_images(unittest.TestCase):
-    print("DEBUG: test_extract_markdown_images class loaded")
+    #print("DEBUG: test_extract_markdown_images class loaded")
     #handeler function extract_markdown_images()
     def test_largetext_with_imbigue(self):
         text = "This is text with a " \
@@ -160,7 +161,7 @@ class test_extract_markdown_images(unittest.TestCase):
 
 #test extract_markdown_links() 2 test
 class test_extract_markdown_links(unittest.TestCase):
-    print("DEBUG: test_extract_markdown_links class loaded")
+    #print("DEBUG: test_extract_markdown_links class loaded")
     def test_simple_links(self):
         simple_text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev"
         result=extract_markdown_links(simple_text)
@@ -179,7 +180,7 @@ class test_extract_markdown_links(unittest.TestCase):
 
 #test split_nodes_image() 7 test
 class test_split_nodes_image(unittest.TestCase):
-    print("DEBUG: test_split_nodes_image class loaded")
+    #print("DEBUG: test_split_nodes_image class loaded")
     def test_simple_test(self):
         simple_text = TextNode("This is text with a link ![to boot dev](https://www.boot.dev) and ![to youtube](https://www.youtube.com/@bootdotdev)",TextType.TEXT)
         result=split_nodes_image([simple_text])
@@ -256,7 +257,7 @@ class test_split_nodes_image(unittest.TestCase):
 
 #test split_nodes_link() 7 tests
 class test_split_nodes_link(unittest.TestCase):
-    print("DEBUG: test_split_nodes_link class loaded")
+    #print("DEBUG: test_split_nodes_link class loaded")
     def test_simple_test(self):
         node = TextNode("This is text with a link ![to boot dev](https://www.boot.dev) and ![to youtube](https://www.youtube.com/@bootdotdev)",TextType.TEXT)
         result=split_nodes_image([node])
@@ -370,3 +371,4 @@ class test_text_to_textnodes(unittest.TestCase):
     def test_None_raises_error(self):
         with self.assertRaises(ValueError):
             text_to_textnodes(None)
+

@@ -10,7 +10,7 @@ from src.leafnode import LeafNode, ParentNode
         self.props=props            #dictionary {"href": "www.google.com"}
 '''
 class TestParentNode(unittest.TestCase):
-    print("DEBUG: TestParentNode class loaded")
+    #print("DEBUG: TestParentNode class loaded")
     def test_properties_types_parent(self):
         
         node2 = LeafNode("p", "Test", props={"style":"color:green"})

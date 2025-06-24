@@ -9,7 +9,7 @@ from src.leafnode import LeafNode
             raise ValueError("LeafNode must have a value.")
 '''
 class TestLeafNode(unittest.TestCase):
-    print("DEBUG: TestLeafNode class loaded")
+    #print("DEBUG: TestLeafNode class loaded")
     def test_properties_types_leaf(self):
         node1 = LeafNode("a","my_url", props={"href":"https://www.google.be","target":"_blanc"})
        
@@ -19,7 +19,7 @@ class TestLeafNode(unittest.TestCase):
         self.assertEqual(type(node1.props), dict)
 
 class TestLeafNode2(unittest.TestCase):
-    print("DEBUG: TestLeafNode2 class loaded")
+    #print("DEBUG: TestLeafNode2 class loaded")
     def test_leaf_to_html_p(self):
         node = LeafNode("p", "text")
         result=node.to_html()
@@ -46,7 +46,7 @@ class TestLeafNode2(unittest.TestCase):
 
 
 class TestleafNodeStrRepr(unittest.TestCase):
-    print("DEBUG: TestHtmlNodeStrRepr1 class loaded")
+    #print("DEBUG: TestHtmlNodeStrRepr1 class loaded")
     def test_leafnode_str_repr_safe(self):
         leaf = LeafNode(tag="span", value="Leaf", props={})
         # Ensure str and repr do not throw RecursionError (or anything)

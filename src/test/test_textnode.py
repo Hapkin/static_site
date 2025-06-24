@@ -4,7 +4,7 @@ from src.textnode import TextNode, TextType
 
 # 5 tests
 class TestTextNode(unittest.TestCase):
-    print("DEBUG: TestTextNode class loaded")
+    #print("DEBUG: TestTextNode class loaded")
     def test_prop_types(self):
         node = TextNode("This is a text node", TextType.BOLD, "https://www.google.com/")
         self.assertEqual(type(node.text), str)

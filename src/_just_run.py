@@ -1,7 +1,11 @@
 from src.leafnode import LeafNode, ParentNode
-from src.handeler import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images,extract_markdown_links,split_nodes_image, split_nodes_link, text_to_textnodes
+from src.handeler_text import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images,extract_markdown_links,split_nodes_image, split_nodes_link, text_to_textnodes
+from src.handeler_blocks import markdown_to_blocks
+from src.handeler_html import markdown_to_html_node
 from src.textnode import TextNode, TextType
 import sys
+import re
+from src.handeler_blocks import BlockType
 
 def main():
     try:
@@ -14,13 +18,56 @@ def main():
         #test_split_nodes_delimiter()
         # Test with the absolute simplest case first
         #print(testing_split_nodes_image())
-        testing_text_to_textnodes()     
+        #testing_text_to_textnodes()     
+        #result=testingmarkdown_to_blocks()
+        text="""
+This is **bolded** paragraph
+text in a p
+tag here
 
+This is another paragraph with _italic_ text and `code` here
+
+"""
+        markdown_to_html_node(text)
+
+        
+             
+        
     except Exception as e:
         print(f"Error occurred: {e}")
         print(f"Error type: {type(e).__name__}")
   #      import traceback
  #       traceback.print_exc()
+
+
+def testingmarkdown_to_blocks():
+     text="""# This is a heading
+
+This is a paragraph of text. It has some **bold** and _italic_ words inside of it.
+  
+    
+
+- This is the first list item in a list block
+- This is a list item
+- This is another list item"""
+     text="""
+This is **bolded** paragraph
+     
+    
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+  
+    
+  
+    
+
+- This is a list
+- with items
+"""
+     result=markdown_to_blocks(text)
+     #print(repr(result))
+     return result
 
 def testing_text_to_textnodes():
     pass
