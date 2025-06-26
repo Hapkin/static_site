@@ -63,7 +63,7 @@ class HTMLNode(ABC):
         return result
     
     def __repr__(self):
-        return f"HtmlNode({self.tag!r}, children={len(self.children) if self.children else 0})"
+        return f"{type(self).__name__}{self.tag!r}, children={len(self.children) if self.children else 0})"
     
         '''
     def props_to_html(self):

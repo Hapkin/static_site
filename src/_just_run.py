@@ -1,7 +1,7 @@
 from src.leafnode import LeafNode, ParentNode
 from src.handeler_text import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images,extract_markdown_links,split_nodes_image, split_nodes_link, text_to_textnodes
 from src.handeler_blocks import markdown_to_blocks
-from src.handeler_html import markdown_to_html_node
+from src.handeler_html import markdown_to_html_node, textnodes_to_htmlnodes
 from src.textnode import TextNode, TextType
 import sys
 import re
@@ -20,13 +20,25 @@ def main():
         #print(testing_split_nodes_image())
         #testing_text_to_textnodes()     
         #result=testingmarkdown_to_blocks()
+        #test_quoteblock()
+        #result=test_p()
+        #breakpoint()
+ 
+#        quit()
+
         text="""
-This is **bolded** paragraph
+This is **this is bolded** paragraph
 text in a p
 tag here
 
-This is another paragraph with _italic_ text and `code` here
+This is another paragraph with _this is in italic_ text and `this is code` here
 
+"""
+        text="""
+```
+This is text that _should_ remain
+the **same** even with inline stuff
+```
 """
         markdown_to_html_node(text)
 
@@ -38,6 +50,58 @@ This is another paragraph with _italic_ text and `code` here
         print(f"Error type: {type(e).__name__}")
   #      import traceback
  #       traceback.print_exc()
+
+def test_p():
+    block_text="""This is another paragraph with _this is in italic_ fsdfs
+    text and ```this is code``` here"""
+    leaf_children=[]
+
+    #print(l_lines_in_blocktext)
+    stripped_line=block_text.strip()
+    new_textnodes=text_to_textnodes(stripped_line)
+    leaf_children=textnodes_to_htmlnodes(new_textnodes)
+    return ParentNode("p", leaf_children)
+    
+
+def test_ul():
+    text="""> 1This is another paragraph with _this is in italic_ fsdfs
+    > 2text and ```this is code``` here"""
+    list_li=[]
+    
+    l_lines_in_blocktext=text.split("\n")
+    #print(l_lines_in_blocktext)
+    for line in l_lines_in_blocktext:
+        new_leafs=[]
+        stripped_line=line.strip()[2:]
+        new_textnodes=text_to_textnodes(stripped_line)
+
+        result=textnodes_to_htmlnodes(new_textnodes)
+        list_li.append(ParentNode("li",result)) 
+    result= ParentNode("ul", list_li)
+    
+    print(result.to_html())    
+
+
+def test_quoteblock():
+        text=""">This is another paragraph with _this is in italic_ fsdfs
+        >text and ```this is code``` here"""
+        #mistake you need to check if there are other types inside the quote text like bold, italic
+        #lines = [LeafNode("q", word[1:] ) for word in l_lines_in_blocktext if word.startswith(">")]
+        new_leafs=[]
+        l_lines_in_blocktext=text.split("\n")
+        for line in l_lines_in_blocktext:
+            stripped_line =line.strip()
+            stripped_line = stripped_line[1:]
+            new_textnodes=text_to_textnodes(stripped_line)
+            for item in new_textnodes:
+                new_leafs.append(item)
+            new_leafs.append(TextNode("\n",TextType.TEXT))
+        
+        # Remove the trailing newline
+        new_leafs.pop()
+        result=textnodes_to_htmlnodes(new_leafs)
+        result= ParentNode("blockquote", result)
+        print(result.to_html())
 
 
 def testingmarkdown_to_blocks():

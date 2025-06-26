@@ -46,7 +46,7 @@ def markdown_to_blocks(markdown):
     #splitted_markdown=markdown.split("\n\n")
     pattern=r"\n[\s]*\n+"
     splitted_markdown=re.split(pattern,markdown)
-
+    
 
     #print(f"{splitted_markdown!r}")
     
@@ -76,7 +76,6 @@ def block_to_block_type(block_text):
 
     if (type(block_text)!=str) or (block_text is None) or (len(block_text)==0):
         raise ValueError(f"block should be text: {block_text}")
-    
     if(block_text.startswith("#")):
         pattern=r"^[#]{1,6}\s"
         if (re.match(pattern,block_text)):

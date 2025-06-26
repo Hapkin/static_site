@@ -13,7 +13,8 @@ class LeafNode(HTMLNode):
         else:
             raise ValueError("LeafNode must have a value.")
         
-        
+    def __repr__(self):
+        return super().__repr__()    
 
     def __eq__(self, other):
         if not isinstance(other, LeafNode):
