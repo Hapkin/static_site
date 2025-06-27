@@ -206,9 +206,9 @@ def text_to_textnodes(text):
     
     new_nodes_list = []
     old_nodes = [TextNode(text, TextType.TEXT)]
-    new_nodes_list = split_nodes_delimiter(old_nodes, "**", TextType.BOLD)
+    new_nodes_list = split_nodes_delimiter(old_nodes, "`", TextType.CODE)
+    new_nodes_list = split_nodes_delimiter(new_nodes_list, "**", TextType.BOLD)
     new_nodes_list = split_nodes_delimiter(new_nodes_list, "_", TextType.ITALIC)
-    new_nodes_list = split_nodes_delimiter(new_nodes_list, "`", TextType.CODE)
     new_nodes_list = split_nodes_link(new_nodes_list)
     new_nodes_list = split_nodes_image(new_nodes_list)
 

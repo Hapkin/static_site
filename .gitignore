@@ -6,3 +6,4 @@ venv/
 
 # mkdocs documentation
 /site
+public/

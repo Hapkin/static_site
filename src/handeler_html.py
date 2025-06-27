@@ -11,28 +11,19 @@ def markdown_to_html_node(markdown):
     
     my_block_texts=markdown_to_blocks(markdown)
     my_block_types=[block_to_block_type(block) for block in my_block_texts]
-    print(f"start")
-    print(my_block_types)
-    print(f"start")
     my_blocks=[]
     
     for i in range(0,(len(my_block_texts))):
         new_block= Block(my_block_texts[i],my_block_types[i])
         my_blocks.append(new_block)
     html_nodes_created_from_my_blocks=[]
-    
     for block in my_blocks:
         if block.block_type != BlockType.CODE:
             block.children=text_to_textnodes(block.text)
         html_nodes_created_from_my_blocks.append(block_to_html(block))
-        
-    print(f"finish")
-    print(html_nodes_created_from_my_blocks)
-    print(f"finish")
-    breakpoint()
+    
         
     my_parent_div.children=html_nodes_created_from_my_blocks
-    #breakpoint()
     #print(my_parent_div.to_html())
     return my_parent_div
     

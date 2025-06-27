@@ -27,20 +27,51 @@ def main():
 #        quit()
 
         text="""
-This is **this is bolded** paragraph
-text in a p
-tag here
+# My Grand Adventure Log
 
-This is another paragraph with _this is in italic_ text and `this is code` here
+This is a **simple paragraph** to start things off. It also has some _italic_ text and a piece of `code_snippet()`.
 
+## Chapter 1: The Mysterious Forest
+
+### A Deep, Dark Place
+
+> "Beware the Whispering Willows," whispered the old hermit.
+> "Their roots run deep, and their secrets deeper still."
+
+### Strange Discoveries
+
+- Found a shimmering **blue** mushroom.
+- Heard a peculiar bird song.
+- Noticed ancient symbols carved into trees:
+
+- First symbol: `circle`
+- Second symbol: `triangle`
+- Third symbol: `square`
+
+### The Path Less Traveled
+
+1.  Follow the mossy stones.
+2.  Cross the bubbling brook.
+3.  Ascend the **Screaming** Peak.
+
+1.  Pack warm clothes.
+2.  Bring extra ropes.
+
+#### A Glimmer of Hope
+
+We saw a faint light in the distance. It looked like a small `campfire`.
+
+> "Could it be a friend?" I wondered aloud.
+```function lightFire() {
+console.log("Fire started!");
+}
+lightFire();```
+
+###### End of Log Entry
+
+This is another paragraph just to ensure multi-paragraph handling is correct. It's a very *long* paragraph that wraps around a bit to test that too. What a journey!
 """
-        text="""
-```
-This is text that _should_ remain
-the **same** even with inline stuff
-```
-"""
-        markdown_to_html_node(text)
+        print(markdown_to_html_node(text).to_html())
 
         
              
@@ -208,16 +239,15 @@ def test_split_nodes_delimiter():
           
      
     text=[
-          TextNode("**start** bold text", TextType.TEXT),
-          TextNode("why so serious **END**", TextType.TEXT),
-          TextNode("how about **the middle** of the sentence", TextType.TEXT)
+          TextNode("This is a **simple paragraph** to start things off. It also has some _italic_ text and a piece of ```codesnippet()```.", TextType.TEXT),
           ]
     test=[
             TextNode("_start_ bold _text_",TextType.TEXT),
             TextNode("why _so_ _serious_ **END**",TextType.TEXT),
         ]
-    #result=split_nodes_delimiter(test,"_", TextType.ITALIC)
-    #print(result)
+    result=split_nodes_delimiter(text,"_", TextType.ITALIC)
+    print(result)
+    return
      
     delimiter = "**"
     text_type= TextType.CODE

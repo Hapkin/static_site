@@ -85,6 +85,16 @@ class Test_split_nodes_delimiter(unittest.TestCase):
             ]
         self.assertEqual(result,expected)
 
+    def test_italic_issue_with_code(self):
+        test=[TextNode("This is a **simple paragraph** to start things off. It also has some _italic_ text and a piece of ```codesnippet()```.", TextType.TEXT)]
+        result=split_nodes_delimiter(test,"_", TextType.ITALIC)
+        expected=[
+            TextNode('This is a **simple paragraph** to start things off. It also has some ', TextType.TEXT),
+            TextNode('italic', TextType.ITALIC),
+            TextNode(" text and a piece of ```codesnippet()```.",TextType.TEXT),
+            ]
+        self.assertEqual(result,expected)
+
     def test_italic_multiple(self):    
         test=[
             TextNode("_start_ bold _text_",TextType.TEXT),

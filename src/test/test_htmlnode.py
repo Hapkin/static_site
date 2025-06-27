@@ -34,7 +34,7 @@ class TestHtmlNodeStrRepr2(unittest.TestCase):
             self.fail(f"Unexpected error in __str__ or __repr__: {e}")
         self.assertIsInstance(s, str)
         self.assertIsInstance(r, str)
-''' 
+r''' 
 BECAME OBSOLETE AS HTMLNODE IS NOW ABSTRACT
 no instance of HTMLNode can be created
 
