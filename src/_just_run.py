@@ -1,11 +1,12 @@
+import sys
+import re
 from src.leafnode import LeafNode, ParentNode
 from src.handeler_text import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images,extract_markdown_links,split_nodes_image, split_nodes_link, text_to_textnodes
 from src.handeler_blocks import markdown_to_blocks
 from src.handeler_html import markdown_to_html_node, textnodes_to_htmlnodes
 from src.textnode import TextNode, TextType
-import sys
-import re
 from src.handeler_blocks import BlockType
+from src.handler_IO import delete_folder, copy_folder_to_folder
 
 def main():
     try:
@@ -23,9 +24,23 @@ def main():
         #test_quoteblock()
         #result=test_p()
         #breakpoint()
- 
+        
+        path_to_del="./public"
+        path_to_from="./static"
+        path_to="./public"
+        #delete_folder(path_to_del)
+        copy_folder_to_folder(path_to_from,path_to)
 #        quit()
 
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        print(f"Error type: {type(e).__name__}")
+  #      import traceback
+ #       traceback.print_exc()
+
+
+
+r'''
         text="""
 # My Grand Adventure Log
 
@@ -72,15 +87,11 @@ lightFire();```
 This is another paragraph just to ensure multi-paragraph handling is correct. It's a very *long* paragraph that wraps around a bit to test that too. What a journey!
 """
         print(markdown_to_html_node(text).to_html())
-
+'''
         
              
         
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        print(f"Error type: {type(e).__name__}")
-  #      import traceback
- #       traceback.print_exc()
+
 
 def test_p():
     block_text="""This is another paragraph with _this is in italic_ fsdfs
