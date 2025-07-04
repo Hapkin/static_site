@@ -3,19 +3,20 @@ from src.handler_IO import write_html_toFile, read_file, read_files_in_folder
 
 
 
-def generate_all_pages_static():
-    content=read_files_in_folder("content/")
+def generate_all_pages_static(base_dir,to_dir, basepath):
+    # base_dir needs "/"??
+    content=read_files_in_folder(base_dir)
     for item in content:
-        public=item.replace("content","public")
+        public=item.replace(base_dir,to_dir)
         public=public.replace("md","html")
-        generate_page(item,"template.html",public)
-        print(f"making: {item} to {public}")
+        generate_page(item,"template.html",public, basepath)
+        #Sprint(f"making: {item} to {public}")
         
 
 def extract_title(md):
     md.strip()
     if(not isinstance(md, str)) or not (md.startswith("# "))or (len(md)<3):
-        print(f"{not isinstance(md, str)}or {not (md.startswith('# '))}or {(len(md)<3)}")
+        #print(f"{not isinstance(md, str)}or {not (md.startswith('# '))}or {(len(md)<3)}")
         raise ValueError("exctract_title: wrong value input")
     else:
         title=md[2:]
@@ -25,8 +26,8 @@ def extract_title(md):
 
         
 
-def generate_page(from_path, template_path, dest_path):
-    print(f"Generating page from {from_path} to {dest_path} using {template_path}.")
+def generate_page(from_path, template_path, dest_path, basepath):
+    #print(f"Generating page from {from_path} to {dest_path} using {template_path}.")
     
     # split title from 'from_path'
     read_from= read_file(from_path)
@@ -49,7 +50,10 @@ def generate_page(from_path, template_path, dest_path):
         raise ValueError(f"generate_page(html_template): incorrect format; expect full <html> page.\n {html_template.split('\n', 1)[0]}")
     
     #replace Title and Content
+    if "{{ Title }}" not in html_template or "{{ Content }}" not in html_template:
+        raise Exception("Template is missing '{{ Title }}' or '{{ Content }}'")
     html=html_template.replace('{{ Title }}', title)
     html=html.replace('{{ Content }}', html_from)
+    html= html.replace('src="/', 'src="{}'.format(basepath)).replace('href="/', 'href="{}'.format(basepath))
     
     write_html_toFile(dest_path, html)

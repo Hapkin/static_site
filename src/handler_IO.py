@@ -7,13 +7,13 @@ from src.handeler_html import check_html
 #delete all files public
 def delete_folder(path_delete):
     if(type(path_delete)!=str):
-        raise ValueError("delete_folder: expecting path to delete (str)")
+        raise ValueError("expecting path to delete (str)")
     if not (os.path.exists(path_delete)):
         raise ValueError(f"Path is not found!: {path_delete}")
     try:
         os.rmdir(path_delete)
     except ValueError as ve:
-        print("%%%%%%%")
+        print(f"delete_folder: {ve}")
     except Exception as e:
         print(f"{path_delete} not empty")
         print(e.__traceback__)
@@ -27,7 +27,7 @@ def delete_folder(path_delete):
                     os.remove(combined)
             os.rmdir(path_delete)
         except Exception as e:
-            print(f"{e} ||ERROR ")
+            print(f"delete_folder: {e} ||ERROR ")
     #finally:
 
         
@@ -63,16 +63,17 @@ def copy_folder_to_folder(path_from, path_to, attempt=0):
      
 def create_dirs(dir):
     dirs= dir.split("/")
-    print(f"dirs: {dirs}")
+    #print(f"dirs: {dirs}")
     my_dir=""
     for i in range(0,len(dirs)):
         my_dir +=dirs[i]+"/"
         if not (os.path.exists(my_dir)):
-            print(f"creating 1: {my_dir}")
+            #print(f"creating 1: {my_dir}")
             os.mkdir(my_dir)
         else:
             #deze bestaat al dus moeten we die aan de rest toevoegen 
-            print(f"deze bestaat al || {my_dir}")
+            #print(f"deze bestaat al || {my_dir}")
+            pass
             
          
 

@@ -1,8 +1,8 @@
 import re
 from src.textnode import TextNode, TextType
 from src.leafnode import LeafNode
-import sys
-sys.setrecursionlimit(50)
+#import sys
+#sys.setrecursionlimit(1000)
 #######
 '''
 def text_node_to_html_node(text_node):

@@ -29,7 +29,7 @@ def main():
         #----------
         #path_to_del="./public"
         path_to_from="./static"
-        path_to="./public"
+        path_to="./docs"
         #delete_folder(path_to_del)
         #copy_folder_to_folder(path_to_from,path_to)
         #md= "# test\n# gddfg dfsdf"
@@ -41,7 +41,7 @@ def main():
         #print(split_nodes_image(list1))
         #generate_page("content/index.md","template.html","public/index.html")
         #read_files_in_folder("content/")
-        generate_all_pages_static()
+        generate_all_pages_static("/")
         #        quit()
 
     except Exception as e:
