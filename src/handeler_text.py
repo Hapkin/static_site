@@ -121,7 +121,7 @@ def split_nodes_image(old_nodes):
     new_nodes = []
     if isinstance(old_nodes, list):
         if not old_nodes:
-            raise ValueError(f"oldnodes: no items in {old_nodes}...")
+            raise ValueError(f"split_nodes_image: no items in {old_nodes}...")
     else:
         raise ValueError(f"oldnodes: this is not a list of nodes {old_nodes}...")
     for node in old_nodes:
@@ -161,7 +161,7 @@ def split_nodes_link(old_nodes):
     new_nodes = []
     if isinstance(old_nodes, list):
         if not old_nodes:
-            raise ValueError(f"oldnodes: no items in {old_nodes}...")
+            raise ValueError(f"split_nodes_link: no items in {old_nodes}...")
     else:
         raise ValueError(f"oldnodes: this is not a list of nodes {old_nodes}...")
     for node in old_nodes:
@@ -203,14 +203,21 @@ def text_to_textnodes(text):
     #This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)
     if not type(text)==str :
         raise ValueError(f"(text) should be a string: {text}")
-    
+    if(len(text.strip())==0):
+       raise ValueError(f"(text) shouldn't be empty: {text}")
+
     new_nodes_list = []
     old_nodes = [TextNode(text, TextType.TEXT)]
+    #print(f"1{old_nodes}")
     new_nodes_list = split_nodes_delimiter(old_nodes, "`", TextType.CODE)
+    #print(f"2{new_nodes_list}")
     new_nodes_list = split_nodes_delimiter(new_nodes_list, "**", TextType.BOLD)
+    #print(f"3{new_nodes_list}")
     new_nodes_list = split_nodes_delimiter(new_nodes_list, "_", TextType.ITALIC)
+    #print(f"4{new_nodes_list}")
     new_nodes_list = split_nodes_link(new_nodes_list)
+    #print(f"${new_nodes_list}")
     new_nodes_list = split_nodes_image(new_nodes_list)
-
+    #print(f"$${new_nodes_list}")
     return new_nodes_list
 

@@ -48,7 +48,13 @@ def block_to_html(block):
         count=len(re.search(pattern,block.text).group(1))
         #removes count chars
         new_text=block.text[count:].strip()
-        return LeafNode(f"h{count}",new_text)
+        #nakijken of er andere formats in de text zitten!!!
+        
+        new_textnodes=text_to_textnodes(new_text)
+        leaf_children=textnodes_to_htmlnodes(new_textnodes)
+        return ParentNode(f"h{count}",leaf_children)
+
+        
 
     elif block.block_type == BlockType.CODE:
         new_text=block.text.strip()
@@ -62,8 +68,11 @@ def block_to_html(block):
         new_leafs=[]
         l_lines_in_blocktext=block.text.split("\n")
         for line in l_lines_in_blocktext:
-            stripped_line =line.strip()
-            stripped_line = stripped_line[1:]
+            stripped_line = line[1:]
+            stripped_line =stripped_line.strip()
+            # if a single ">" is found skip it 
+            if(len(stripped_line)==0):
+                continue    
             new_textnodes=text_to_textnodes(stripped_line)
             for item in new_textnodes:
                 new_leafs.append(item)
@@ -121,3 +130,12 @@ def block_to_html(block):
         return ParentNode("p", leaf_children)
     
 
+# simple check if html_template is a full html document (used in multiple locations)
+def check_html(html_template):
+    if(html_template!=str): 
+        return False
+    html_template=html_template.strip()
+    if ((html_template.startswith("<!doctype html>"))) or (html_template.startswith("<html>")) and (html_template.endswith("</html>")):
+        return True
+    else:
+        return False

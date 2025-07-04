@@ -6,7 +6,9 @@ from src.handeler_blocks import markdown_to_blocks
 from src.handeler_html import markdown_to_html_node, textnodes_to_htmlnodes
 from src.textnode import TextNode, TextType
 from src.handeler_blocks import BlockType
-from src.handler_IO import delete_folder, copy_folder_to_folder
+from src.handler_IO import delete_folder, copy_folder_to_folder, read_files_in_folder
+from src.generate_pages import extract_title,generate_page, generate_all_pages_static
+
 
 def main():
     try:
@@ -24,13 +26,23 @@ def main():
         #test_quoteblock()
         #result=test_p()
         #breakpoint()
-        
-        path_to_del="./public"
+        #----------
+        #path_to_del="./public"
         path_to_from="./static"
         path_to="./public"
         #delete_folder(path_to_del)
-        copy_folder_to_folder(path_to_from,path_to)
-#        quit()
+        #copy_folder_to_folder(path_to_from,path_to)
+        #md= "# test\n# gddfg dfsdf"
+        #text= md.split("\n",1)
+        #text_left=text[1]
+        #print(extract_title(text[0]))
+        #print(text_left)
+        #list1=[TextNode('![JRR Tolkien sitting](/images/tolkien.png)', TextType.TEXT)]
+        #print(split_nodes_image(list1))
+        #generate_page("content/index.md","template.html","public/index.html")
+        #read_files_in_folder("content/")
+        generate_all_pages_static()
+        #        quit()
 
     except Exception as e:
         print(f"Error occurred: {e}")
@@ -142,7 +154,7 @@ def test_quoteblock():
         # Remove the trailing newline
         new_leafs.pop()
         result=textnodes_to_htmlnodes(new_leafs)
-        result= ParentNode("blockquote", result)
+        result= ParentNode("blockquote", result.strip())
         print(result.to_html())
 
 
