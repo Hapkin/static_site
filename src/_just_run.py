@@ -13,12 +13,20 @@ from src.generate_pages import extract_title,generate_page, generate_all_pages_s
 def main():
     try:
         pass
+        test_split_nodes_delimiter()
+        
+        textmd="test **italic _bold_ within** and text again"
+        
+        result=text_to_textnodes(textmd)
+        print(result)
+
+
         #print("hello from main")
         #testing_leaf()
         #testing_parent()
         #test_TEXTNode()
         #print("fool")
-        #test_split_nodes_delimiter()
+        
         # Test with the absolute simplest case first
         #print(testing_split_nodes_image())
         #testing_text_to_textnodes()     
@@ -28,8 +36,6 @@ def main():
         #breakpoint()
         #----------
         #path_to_del="./public"
-        path_to_from="./static"
-        path_to="./docs"
         #delete_folder(path_to_del)
         #copy_folder_to_folder(path_to_from,path_to)
         #md= "# test\n# gddfg dfsdf"
@@ -41,7 +47,7 @@ def main():
         #print(split_nodes_image(list1))
         #generate_page("content/index.md","template.html","public/index.html")
         #read_files_in_folder("content/")
-        generate_all_pages_static("/")
+        #generate_all_pages_static("/")
         #        quit()
 
     except Exception as e:
@@ -258,17 +264,15 @@ def test_TEXTNode():
     print(html_node)
 
 def test_split_nodes_delimiter():
-     #text=[ TextNode( '**This** is text with a **bolded phrase** in the middle', TextType.TEXT)] 
+    text=[ TextNode( 'This is _text with a **bolded phrase** in_ the middle', TextType.TEXT)] 
           
      
     text=[
-          TextNode("This is a **simple paragraph** to start things off. It also has some _italic_ text and a piece of ```codesnippet()```.", TextType.TEXT),
+          TextNode("This is a **simple paragraph _to_ start things** off. It also has some _italic_ text and a piece of ```codesnippet()```.", TextType.TEXT),
           ]
-    test=[
-            TextNode("_start_ bold _text_",TextType.TEXT),
-            TextNode("why _so_ _serious_ **END**",TextType.TEXT),
-        ]
-    result=split_nodes_delimiter(text,"_", TextType.ITALIC)
+    result=split_nodes_delimiter(text,"**", TextType.BOLD)
+    result=split_nodes_delimiter(result,"_", TextType.ITALIC)
+    
     print(result)
     return
      
