@@ -36,6 +36,42 @@ def text_node_to_html_node(text_node):
             raise ValueError(f"Error:{text_node.text_type} is not a valid TextType?.?")
         
 
+def split_nodes_bolditalic(old_nodes):
+    list_new_nodes=[]
+    #loop trough all TextType.TEXT
+    for node in old_nodes:
+        #skip code types!
+        print("#### other node ####")
+        if (node.text_type == TextType.CODE):
+            list_new_nodes.append(node)
+            continue
+        text=node.text
+        #lets first check if there are bolds
+        list_of_bolds=[text.split("**")]
+        print(list_of_bolds)
+
+        list_of_italics=[text.split("_")]
+        print(list_of_italics)
+        #
+        #
+        #opnieuw bekijken als 1 leeg is enkel de andere uitvoeren
+        # als beide leeg zijn gewoon .TEXT maken (zou al moeten zijn?)
+
+
+        if(list_of_italics)or(list_of_bolds):
+            if(list_of_italics):
+                new_nodes_list = split_nodes_delimiter(new_nodes_list, "**", TextType.BOLD)
+            if(list_of_bolds):        
+                new_nodes_list = split_nodes_delimiter(new_nodes_list, "_", TextType.ITALIC)
+            else:
+                new_nodes_list.append(node)
+                continue
+
+
+        #run bold
+        new_nodes_list = split_nodes_delimiter(new_nodes_list, "**", TextType.BOLD)
+        #run italic
+        new_nodes_list = split_nodes_delimiter(new_nodes_list, "_", TextType.ITALIC)
 
 #moeten eerst TextNodes worden daarma .text_node_to_html_node()
 #old nodes zijn textnodes!! []
@@ -218,8 +254,9 @@ def text_to_textnodes(text):
     #what if we add BOLD and ITALIC as not processed type so it will still look within 
     # not working because then it will close the tag in another node... break
     # would need to make a seperate function like link and image... but that was not the idea
-    new_nodes_list = split_nodes_delimiter(new_nodes_list, "**", TextType.BOLD)
-    new_nodes_list = split_nodes_delimiter(new_nodes_list, "_", TextType.ITALIC)
+    #new_nodes_list = split_nodes_delimiter(new_nodes_list, "**", TextType.BOLD)
+    #new_nodes_list = split_nodes_delimiter(new_nodes_list, "_", TextType.ITALIC)
+    new_nodes_list= split_nodes_bolditalic(new_nodes_list)
     new_nodes_list = split_nodes_link(new_nodes_list)
     new_nodes_list = split_nodes_image(new_nodes_list)
     return new_nodes_list
