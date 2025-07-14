@@ -13,12 +13,39 @@ from src.generate_pages import extract_title,generate_page, generate_all_pages_s
 def main():
     try:
         pass
-        test_split_nodes_delimiter()
+        #test_split_nodes_delimiter()
+        text="_Hel**l**o_, welcome **to _my_ world**. Hello, welcome **to _my_ world**. Hello, welcome _to **my** world_**.**"
+        pattern_bold=r"\*\*(.*?)\*\*"
+        all_bold=re.finditer(pattern_bold,text)
+        pattern_italic=r"\_(.*?)\_"
+        all_italic=re.finditer(pattern_italic,text)
+        a=True
+        for i in all_bold:
+            i_span=i.span()
+            for j in all_italic:
+                j_span=j.span()
+                if(a==True):
+                    print("###### italic #####\n")
+                    a=False
+                #first check if i(x,y) i[y]<j[x] dan kan er geen meer in deze i coordinaten liggen
+                if(i_span[1]<j_span[0]):
+                    break
+                #als i[x]<j[x] en i[y]>i[y] dan hebben we parent van ITALIC met BOLD erin?
+                if(i_span[0]>j_span[0])and(i_span[1]<j_span[1]):
+                    print("new_italic=ParentNode(<b>,my_children)")
+                    print(f"{text[j_span[0]:j_span[1]]}")
+                    print(".append want er kan nog een 2e child zijn ook...+ de text ervoor moet een textnode worden... dit is nog niet de oplossing...")
+                print(j_span)
+                
+            
+            if(a==False):
+                print("###### bold #####\n")
+                a=True
+            
+            print(i_span)
         
-        textmd="test **italic _bold_ within** and text again"
         
-        result=text_to_textnodes(textmd)
-        print(result)
+        
 
 
         #print("hello from main")
@@ -55,58 +82,7 @@ def main():
         print(f"Error type: {type(e).__name__}")
   #      import traceback
  #       traceback.print_exc()
-
-
-
-r'''
-        text="""
-# My Grand Adventure Log
-
-This is a **simple paragraph** to start things off. It also has some _italic_ text and a piece of `code_snippet()`.
-
-## Chapter 1: The Mysterious Forest
-
-### A Deep, Dark Place
-
-> "Beware the Whispering Willows," whispered the old hermit.
-> "Their roots run deep, and their secrets deeper still."
-
-### Strange Discoveries
-
-- Found a shimmering **blue** mushroom.
-- Heard a peculiar bird song.
-- Noticed ancient symbols carved into trees:
-
-- First symbol: `circle`
-- Second symbol: `triangle`
-- Third symbol: `square`
-
-### The Path Less Traveled
-
-1.  Follow the mossy stones.
-2.  Cross the bubbling brook.
-3.  Ascend the **Screaming** Peak.
-
-1.  Pack warm clothes.
-2.  Bring extra ropes.
-
-#### A Glimmer of Hope
-
-We saw a faint light in the distance. It looked like a small `campfire`.
-
-> "Could it be a friend?" I wondered aloud.
-```function lightFire() {
-console.log("Fire started!");
-}
-lightFire();```
-
-###### End of Log Entry
-
-This is another paragraph just to ensure multi-paragraph handling is correct. It's a very *long* paragraph that wraps around a bit to test that too. What a journey!
-"""
-        print(markdown_to_html_node(text).to_html())
-'''
-        
+     
              
         
 
@@ -268,13 +244,9 @@ def test_split_nodes_delimiter():
           
      
     text=[
-          TextNode("This is a **simple paragraph _to_ start things** off. It also has some _italic_ text and a piece of ```codesnippet()```.", TextType.TEXT),
+          TextNode("This is a **simple paragraph _to_ start things** off. It also has some _italic_ text and a piece of.", TextType.TEXT),
           ]
-    result=split_nodes_delimiter(text,"**", TextType.BOLD)
-    result=split_nodes_delimiter(result,"_", TextType.ITALIC)
-    
-    print(result)
-    return
+    return 0
      
     delimiter = "**"
     text_type= TextType.CODE
