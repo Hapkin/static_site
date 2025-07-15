@@ -9,10 +9,21 @@ class TextType(Enum):
     LINK = "a"       #"[anchor text](url)"
     IMAGE = "img"     #"![alt text](url)"
 
+class ReMatches():
+    def __init__(self, posxy, group1):
+        self.x=posxy[0]
+        self.y=posxy[1]
+        self.group=group1
+
+    def __str__(self):
+        if(self.x is not None )and(self.y is not None)and (self.group is not None):
+            return (f"pos: {self.x},{self.y} || {self.group}")
+
+    
 
 
 class TextNode():
-    def __init__(self, text, text_type, url=None):
+    def __init__(self, text, text_type, url=None, IB=None):
         self.text = text
         if isinstance(text_type, TextType):
             self.text_type= text_type #member of TEXT_TYPE enum

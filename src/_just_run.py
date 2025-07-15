@@ -4,7 +4,7 @@ from src.leafnode import LeafNode, ParentNode
 from src.handeler_text import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images,extract_markdown_links,split_nodes_image, split_nodes_link, text_to_textnodes
 from src.handeler_blocks import markdown_to_blocks
 from src.handeler_html import markdown_to_html_node, textnodes_to_htmlnodes
-from src.textnode import TextNode, TextType
+from src.textnode import TextNode, TextType, ReMatches
 from src.handeler_blocks import BlockType
 from src.handler_IO import delete_folder, copy_folder_to_folder, read_files_in_folder
 from src.generate_pages import extract_title,generate_page, generate_all_pages_static
@@ -14,35 +14,122 @@ def main():
     try:
         pass
         #test_split_nodes_delimiter()
-        text="_Hel**l**o_, welcome **to _my_ world**. Hello, welcome **to _my_ world**. Hello, welcome _to **my** world_**.**"
+        text="_H**e**l**l**o_, welcome **to _my_ world**. This, _is a_ test, _for **BOLD** moves_**.** abc"
         pattern_bold=r"\*\*(.*?)\*\*"
-        all_bold=re.finditer(pattern_bold,text)
+        re_bold=re.finditer(pattern_bold,text)
+        #lijst maken van de resultaten regex; obj ReMatches(x,y,group1) => group1 is het resultaat zonder**/_
+        list_bold = [ReMatches(result.span(), result.group(1)) for result in re_bold]
+        
         pattern_italic=r"\_(.*?)\_"
-        all_italic=re.finditer(pattern_italic,text)
-        a=True
-        for i in all_bold:
-            i_span=i.span()
-            for j in all_italic:
-                j_span=j.span()
-                if(a==True):
-                    print("###### italic #####\n")
-                    a=False
-                #first check if i(x,y) i[y]<j[x] dan kan er geen meer in deze i coordinaten liggen
-                if(i_span[1]<j_span[0]):
-                    break
-                #als i[x]<j[x] en i[y]>i[y] dan hebben we parent van ITALIC met BOLD erin?
-                if(i_span[0]>j_span[0])and(i_span[1]<j_span[1]):
-                    print("new_italic=ParentNode(<b>,my_children)")
-                    print(f"{text[j_span[0]:j_span[1]]}")
-                    print(".append want er kan nog een 2e child zijn ook...+ de text ervoor moet een textnode worden... dit is nog niet de oplossing...")
-                print(j_span)
+        re_italic=re.finditer(pattern_italic,text)
+        list_italic = [ ReMatches(result.span(), result.group(1)) for result in re_italic]
+        
+        list_of_nodes=[]
+        #b en i teller dienen om op de juiste match te blijven zitten
+        b_teller=0
+        i_teller=0
+        #t teller is waar in de string hij zich bevindt
+        t_teller=0
+        while (t_teller<len(text)):
+            laagste_x=t_teller
+            
+            print(f"first {list_bold[b_teller].x} : {list_bold[b_teller].y}")
+            print(t_teller)
+            breakpoint()
+            ##example: list_bold[b_teller][span/group][xy0][group1]
+            b_x=list_bold[b_teller].x
+            b_y=list_bold[b_teller].y
+            print(f"$ {b_x}, {b_y}") #info
+            i_x=list_italic[i_teller].x
+            i_y=list_italic[i_teller].y
+            print(f"$ {i_x}, {i_y}") #info
+            print(list_italic[i_teller])
+            if(laagste_x<b_x)and(laagste_x<i_x):
+                #laagste_x is de laagste dus is het een textfield
+                if(b_x<i_x):
+                    laagste_x=b_x
+                else:
+                    laagste_x=i_x
+
+                new_node= TextNode(text[t_teller:laagste_x],TextType.TEXT)
+                list_of_nodes.append(new_node)
+                #teller gelijk zetten naar laagste x (kan bold of italic zijn)
+                t_teller=laagste_x
+            elif(b_x<i_x):
+                laagste_x=b_x
+                #laagste_x is een bold item
+                while(b_y>i_y):
+                    #er zit een italic item in deze BOLD!!
+                    new_node= TextNode(text[b_x:b_y],TextType.BOLD, IB="_") #IB toegevoegd om later parentnode te maken
+                    list_of_nodes.append(new_node)
+                    if(b_teller<len(list_bold)):
+                        b_teller+=1
+                    if(i_teller<len(list_italic)):
+                        i_teller+=1 #? wat als er 2 italic items inzitten... while!
+                        i_x=list_italic[i_teller].x
+                        i_y=list_italic[i_teller].y
+                    else:
+                        break
+                #als b_y kleiner is dan is het volgende italic element buiten deze bold
+                new_node= TextNode(text[b_x:b_y],TextType.BOLD)
+                list_of_nodes.append(new_node)
+                if(b_teller<len(list_bold)):
+                    b_teller+=1
+                #string verder zetten naar einde van huidige bold
+                t_teller=b_y
+            elif(i_x<b_x):
+                laagste_x=i_x
+                #laagste_x is een bold item
+                while(i_y>b_y):
+                    #er zit een italic item in deze BOLD!!
+                    new_node= TextNode(text[i_x:i_y],TextType.ITALIC, IB="**") 
+                    list_of_nodes.append(new_node)
+                    if(i_teller<len(list_italic)):
+                        i_teller+=1
+                    if(b_teller<len(list_bold)):
+                        b_teller+=1 
+                        b_x=list_bold[b_teller].x
+                        b_y=list_bold[b_teller].y
+                    else:
+                        break
+
+                #als i_y kleiner is dan is het volgende italic element buiten deze bold
+                new_node= TextNode(text[i_x:i_y],TextType.ITALIC)
+                list_of_nodes.append(new_node)
+                if(i_teller<len(list_italic)):
+                    i_teller+=1
+                #string verder zetten naar einde van huidige bold
+                t_teller=i_y
+            else:
+                 raise ValueError("hier zou hij niet mogen komen...")
+                     
+            
+
+            #
+            
+
+
+            '''
+            for i in all_bold:
+                #location of the bold 
+                i_span=i.span()
                 
-            
-            if(a==False):
-                print("###### bold #####\n")
-                a=True
-            
-            print(i_span)
+                #this gives the value without **?**
+                #print(i.group(1))
+                for j in all_italic:
+                    j_span=j.span()
+
+                    print(j.group(1))
+                    #first check if i(x,y) i[y]<j[x] dan kan er geen meer in deze i coordinaten liggen
+                    if(i_span[1]<j_span[0]):
+                        break
+                    #als i[x]<j[x] en i[y]>i[y] dan hebben we parent van ITALIC met BOLD erin?
+                    if(i_span[0]>j_span[0])and(i_span[1]<j_span[1]):
+                        print(f"%% {text[j_span[0]:j_span[1]]}")
+                    else:
+                        pass
+'''
+        
         
         
         
