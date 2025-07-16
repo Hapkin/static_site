@@ -1,7 +1,8 @@
 import sys
 import re
+import traceback
 from src.leafnode import LeafNode, ParentNode
-from src.handeler_text import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images,extract_markdown_links,split_nodes_image, split_nodes_link, text_to_textnodes
+from src.handeler_text import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images,extract_markdown_links,split_nodes_image, split_nodes_link, text_to_textnodes, split_nodes_bolditalic
 from src.handeler_blocks import markdown_to_blocks
 from src.handeler_html import markdown_to_html_node, textnodes_to_htmlnodes
 from src.textnode import TextNode, TextType, ReMatches
@@ -14,102 +15,19 @@ def main():
     try:
         pass
         #test_split_nodes_delimiter()
-        text="_H**e**l**l**o_, welcome **to _my_ world**. This, _is a_ test, _for **BOLD** moves_**.** abc"
-        pattern_bold=r"\*\*(.*?)\*\*"
-        re_bold=re.finditer(pattern_bold,text)
-        #lijst maken van de resultaten regex; obj ReMatches(x,y,group1) => group1 is het resultaat zonder**/_
-        list_bold = [ReMatches(result.span(), result.group(1)) for result in re_bold]
+        text="a _H**e**l**l**o_, welcome **to _my_ world**. This, _is a_ test, _for **BOLD** moves_ **.** abc"
+        text2="_**abc**_"
         
-        pattern_italic=r"\_(.*?)\_"
-        re_italic=re.finditer(pattern_italic,text)
-        list_italic = [ ReMatches(result.span(), result.group(1)) for result in re_italic]
+        #print(original_ItalicBold(text))
+        my_nodes=[(TextNode(text,TextType.TEXT)), (TextNode(text2,TextType.TEXT)), (TextNode(text2,TextType.TEXT))]
+        result1=split_nodes_bolditalic(my_nodes)
+        print(textnodes_to_htmlnodes(result1))
         
-        list_of_nodes=[]
-        #b en i teller dienen om op de juiste match te blijven zitten
-        b_teller=0
-        i_teller=0
-        #t teller is waar in de string hij zich bevindt
-        t_teller=0
-        while (t_teller<len(text)):
-            laagste_x=t_teller
-            
-            print(f"first {list_bold[b_teller].x} : {list_bold[b_teller].y}")
-            print(t_teller)
-            breakpoint()
-            ##example: list_bold[b_teller][span/group][xy0][group1]
-            b_x=list_bold[b_teller].x
-            b_y=list_bold[b_teller].y
-            print(f"$ {b_x}, {b_y}") #info
-            i_x=list_italic[i_teller].x
-            i_y=list_italic[i_teller].y
-            print(f"$ {i_x}, {i_y}") #info
-            print(list_italic[i_teller])
-            if(laagste_x<b_x)and(laagste_x<i_x):
-                #laagste_x is de laagste dus is het een textfield
-                if(b_x<i_x):
-                    laagste_x=b_x
-                else:
-                    laagste_x=i_x
-
-                new_node= TextNode(text[t_teller:laagste_x],TextType.TEXT)
-                list_of_nodes.append(new_node)
-                #teller gelijk zetten naar laagste x (kan bold of italic zijn)
-                t_teller=laagste_x
-            elif(b_x<i_x):
-                laagste_x=b_x
-                #laagste_x is een bold item
-                while(b_y>i_y):
-                    #er zit een italic item in deze BOLD!!
-                    new_node= TextNode(text[b_x:b_y],TextType.BOLD, IB="_") #IB toegevoegd om later parentnode te maken
-                    list_of_nodes.append(new_node)
-                    if(b_teller<len(list_bold)):
-                        b_teller+=1
-                    if(i_teller<len(list_italic)):
-                        i_teller+=1 #? wat als er 2 italic items inzitten... while!
-                        i_x=list_italic[i_teller].x
-                        i_y=list_italic[i_teller].y
-                    else:
-                        break
-                #als b_y kleiner is dan is het volgende italic element buiten deze bold
-                new_node= TextNode(text[b_x:b_y],TextType.BOLD)
-                list_of_nodes.append(new_node)
-                if(b_teller<len(list_bold)):
-                    b_teller+=1
-                #string verder zetten naar einde van huidige bold
-                t_teller=b_y
-            elif(i_x<b_x):
-                laagste_x=i_x
-                #laagste_x is een bold item
-                while(i_y>b_y):
-                    #er zit een italic item in deze BOLD!!
-                    new_node= TextNode(text[i_x:i_y],TextType.ITALIC, IB="**") 
-                    list_of_nodes.append(new_node)
-                    if(i_teller<len(list_italic)):
-                        i_teller+=1
-                    if(b_teller<len(list_bold)):
-                        b_teller+=1 
-                        b_x=list_bold[b_teller].x
-                        b_y=list_bold[b_teller].y
-                    else:
-                        break
-
-                #als i_y kleiner is dan is het volgende italic element buiten deze bold
-                new_node= TextNode(text[i_x:i_y],TextType.ITALIC)
-                list_of_nodes.append(new_node)
-                if(i_teller<len(list_italic)):
-                    i_teller+=1
-                #string verder zetten naar einde van huidige bold
-                t_teller=i_y
-            else:
-                 raise ValueError("hier zou hij niet mogen komen...")
-                     
-            
-
             #
             
 
 
-            '''
+        '''
             for i in all_bold:
                 #location of the bold 
                 i_span=i.span()
@@ -167,11 +85,132 @@ def main():
     except Exception as e:
         print(f"Error occurred: {e}")
         print(f"Error type: {type(e).__name__}")
-  #      import traceback
- #       traceback.print_exc()
+
+        traceback.print_exc()
      
              
+def original_ItalicBold(text):
+    pattern_bold=r"\*\*(.*?)\*\*"
+    re_bold=re.finditer(pattern_bold,text)
+    #lijst maken van de resultaten regex; obj ReMatches(x,y,group1) => group1 is het resultaat zonder**/_
+    list_bold = [ReMatches(result.span(), result.group(1)) for result in re_bold]
+    
+    pattern_italic=r"\_(.*?)\_"
+    re_italic=re.finditer(pattern_italic,text)
+    list_italic = [ ReMatches(result.span(), result.group(1)) for result in re_italic]
+    
+    list_of_nodes=[]
+    #b en i teller dienen om op de juiste match te blijven zitten
+    
+    b_teller=0
+    b_max=len(list_bold)-1
+
+    i_teller=0
+    i_max=len(list_italic)-1
+    #t teller is waar in de string hij zich bevindt
+    t_teller=0
+    while (t_teller<(len(text)-1)):
+        laagste_x=t_teller
         
+        ##example: list_bold[b_teller][span/group][xy0][group1]
+        if(list_bold): 
+            b_x=list_bold[b_teller].x
+            b_y=list_bold[b_teller].y
+        else:
+            b_x=float("inf")
+            b_y=float("inf")
+        #print(f"$ {b_x}, {b_y}") #info
+        if(list_italic): 
+            i_x=list_italic[i_teller].x  ### HIER loopt hij vast op het einde
+            i_y=list_italic[i_teller].y
+        else:
+            i_x=float("inf")
+            i_y=float("inf")
+        #print(f"$ {i_x}, {i_y}") #info
+        #print(list_italic[i_teller])
+
+        #print(f"first: laagste_x={laagste_x}=?{t_teller} b_x: {b_x} || i_x: {i_x}")
+        #print(f"TEXT: if(laagste_x<b_x)and(laagste_x<i_x): {(laagste_x<b_x)}and{(laagste_x<i_x)}")
+        #print(f"BOLD: elif(b_x<i_x): ({b_x}<{i_x}): b_teller={b_teller}")
+        #print(f"ITAL: elif(i_x<b_x): ({i_x}<{b_x}): i_teller={i_teller}")
+        #breakpoint()
+        if(laagste_x<b_x)and(laagste_x<i_x):
+            
+            #laagste_x is de laagste dus is het een textfield
+            if(b_x<i_x):
+                laagste_x=b_x
+            else:
+                laagste_x=i_x
+            if(laagste_x==float("inf")):
+                laagste_x= len(text)
+
+            new_node= TextNode(text[t_teller:laagste_x],TextType.TEXT)
+            list_of_nodes.append(new_node)
+            #teller gelijk zetten naar laagste x (kan bold of italic zijn)
+            t_teller=laagste_x
+        elif(b_x<i_x):
+            laagste_x=b_x
+            #laagste_x is een bold item
+            while(b_y>i_y):
+                #er zit een italic item in deze BOLD!!
+                new_node= TextNode(list_bold[b_teller].group,TextType.BOLD, IB="_") #IB toegevoegd om later parentnode te maken
+                if(i_teller<len(list_italic)):
+                    i_teller+=1 #? wat als er 2 italic items inzitten... while!
+                    i_x=list_italic[i_teller].x
+                    i_y=list_italic[i_teller].y
+                
+                else:
+                    list_of_nodes.append(new_node)
+                    if(b_teller<b_max):
+                        b_teller+=1
+                    else:
+                        list_bold[b_teller].x=float("inf")
+                        list_bold[b_teller].y=float("inf")
+                    break
+            #als b_y kleiner is dan is het volgende italic element buiten deze bold
+            new_node= TextNode(list_bold[b_teller].group,TextType.BOLD)
+            list_of_nodes.append(new_node)
+            if(b_teller<b_max):
+                b_teller+=1
+            else:
+                list_bold[b_teller].x=float("inf")
+                list_bold[b_teller].y=float("inf")
+            #string verder zetten naar einde van huidige bold
+            t_teller=b_y
+        elif(i_x<b_x):
+            laagste_x=i_x
+            #laagste_x is een bold item
+            while(i_y>b_y):
+                #er zit een italic item in deze BOLD!!
+                new_node= TextNode(list_italic[i_teller].group,TextType.ITALIC, IB="**") 
+                
+
+                if(b_teller<b_max):
+                    b_teller+=1 #? wat als er 2 italic items inzitten... while!
+                    b_x=list_bold[b_teller].x
+                    b_y=list_bold[b_teller].y
+                else:
+                    list_of_nodes.append(new_node)
+                    if(i_teller<i_max):
+                        i_teller+=1
+                    else:
+                        list_italic[i_teller].x=float("inf")
+                        list_italic[i_teller].y=float("inf")
+                    break
+            #als b_y kleiner is dan is het volgende italic element buiten deze bold
+            new_node= TextNode(list_italic[i_teller].group,TextType.ITALIC)
+            list_of_nodes.append(new_node)
+            if(i_teller<i_max):
+                i_teller+=1
+            else:
+                list_italic[i_teller].x=float("inf")
+                list_italic[i_teller].y=float("inf")
+            #string verder zetten naar einde van huidige bold
+            t_teller=i_y
+        else:
+                raise ValueError("hier zou hij niet mogen komen...")
+                    
+    return list_of_nodes
 
 
 def test_p():
@@ -342,6 +381,8 @@ def test_split_nodes_delimiter():
     #for item in result:
     #     print(type(item))
     #     print(f"{item}\n")
+
+
 
 #if __name__ == "__main__":
 main()

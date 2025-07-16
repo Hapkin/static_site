@@ -30,15 +30,18 @@ class TextNode():
         else:
             raise ValueError(f"{text_type} != TextType.* :Raised in class(TextNode)")
         self.url = url
+        self.IB=IB
     
     def __eq__(self, other):
         if(self.text==other.text) and (self.text_type==other.text_type) and(self.url==other.url):
             return True
         
     def __repr__(self):
-        if(self.url is None):
-            return f"TextNode({self.text!r}, {self.text_type})"
-        else:
-            return f"TextNode({self.text!r}, {self.text_type}, {self.url!r})"
+        result=f"TextNode({self.text!r}, {self.text_type})"
+        if(self.url is not None):
+            result+=f", {self.url!r})"
+        if(self.IB is not None):
+            result+=f", {self.IB!r})"
+        return result
     
 
