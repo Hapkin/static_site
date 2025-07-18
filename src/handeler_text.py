@@ -1,6 +1,7 @@
 import re
 from src.textnode import TextNode, TextType, ReMatches
-from src.leafnode import LeafNode
+from src.leafnode import LeafNode, ParentNode
+#from src.handeler_html import textnodes_to_htmlnodes
 #import sys
 #sys.setrecursionlimit(1000)
 #######
@@ -23,9 +24,23 @@ def text_node_to_html_node(text_node):
         case TextType.TEXT:
             return LeafNode(None,value=text_node.text)
         case TextType.BOLD:
-            return LeafNode("b", value=text_node.text)
+            if(text_node.IB is not None):
+                text_node.text_type=TextType.TEXT
+                children=split_nodes_delimiter([text_node],"_", TextType.ITALIC)
+                leaf_children=[text_node_to_html_node(child) for child in children]
+                my_parent=ParentNode("b",leaf_children)
+                return my_parent
+            else:
+                return LeafNode("b", value=text_node.text)
         case TextType.ITALIC:
-            return LeafNode("i", value=text_node.text)
+            if(text_node.IB is not None):
+                text_node.text_type=TextType.TEXT
+                children=split_nodes_delimiter([text_node],"**", TextType.BOLD)
+                leaf_children=[text_node_to_html_node(child) for child in children]
+                my_parent=ParentNode("i",leaf_children)
+                return my_parent
+            else:
+                return LeafNode("i", value=text_node.text)
         case TextType.CODE:
             return LeafNode("code", value=text_node.text)
         case TextType.LINK:
@@ -38,9 +53,9 @@ def text_node_to_html_node(text_node):
 
 def split_nodes_bolditalic(old_nodes):
     list_of_nodes=[]
-    print(len(old_nodes))
+    #print(len(old_nodes))
     for node in old_nodes:
-        breakpoint()
+        
         if(node.text_type!=TextType.TEXT):
             list_of_nodes.append(node)
             continue
@@ -57,7 +72,6 @@ def split_nodes_bolditalic(old_nodes):
         
         
         #b en i teller dienen om op de juiste match te blijven zitten
-        
         b_teller=0
         b_max=len(list_bold)-1
 
@@ -65,35 +79,39 @@ def split_nodes_bolditalic(old_nodes):
         i_max=len(list_italic)-1
         #t teller is waar in de string hij zich bevindt
         t_teller=0
+        t_max=(len(text)-1)
+        #initializen naar "inf" 
         b_x=0
         b_y=0
         i_x=0
         i_y=0
-        while (t_teller<(len(text)-1)):
+        while (t_teller<=t_max):
             laagste_x=t_teller
-            
+            #herinitialiseren elke run
+            new_node = None
             ##example: list_bold[b_teller][span/group][xy0][group1]
-            if(list_bold): 
+            if(list_bold)and(b_x!=float("inf")): 
                 b_x=list_bold[b_teller].x
                 b_y=list_bold[b_teller].y
             else:
                 b_x=float("inf")
                 b_y=float("inf")
             #print(f"$ {b_x}, {b_y}") #info
-            if(list_italic): 
+            if(list_italic)and(i_x!=float("inf")): 
                 i_x=list_italic[i_teller].x
                 i_y=list_italic[i_teller].y
             else:
                 i_x=float("inf")
                 i_y=float("inf")
+            
             #print(f"$ {i_x}, {i_y}") #info
             #print(list_italic[i_teller])
 
-            #print(f"first: laagste_x={laagste_x}=?{t_teller} b_x: {b_x} || i_x: {i_x}")
+            #print(f"first: laagste_x={laagste_x}=?{t_teller} b_x,y: {b_x},{b_y} || i_x,i_y: {i_x},{i_y}")
             #print(f"TEXT: if(laagste_x<b_x)and(laagste_x<i_x): {(laagste_x<b_x)}and{(laagste_x<i_x)}")
             #print(f"BOLD: elif(b_x<i_x): ({b_x}<{i_x}): b_teller={b_teller}")
             #print(f"ITAL: elif(i_x<b_x): ({i_x}<{b_x}): i_teller={i_teller}")
-            
+            #breakpoint()
             if(laagste_x<b_x)and(laagste_x<i_x):
                 
                 #laagste_x is de laagste dus is het een textfield
@@ -108,19 +126,23 @@ def split_nodes_bolditalic(old_nodes):
                 list_of_nodes.append(new_node)
                 #teller gelijk zetten naar laagste x (kan bold of italic zijn)
                 t_teller=laagste_x
+                
             elif(b_x<i_x):
                 laagste_x=b_x
                 #laagste_x is een bold item
                 while(b_y>i_y):
+                    
                     #er zit een italic item in deze BOLD!!
                     new_node= TextNode(list_bold[b_teller].group,TextType.BOLD, IB="_") #IB toegevoegd om later parentnode te maken
-                    if(i_teller<len(list_italic)):
+                    
+                    if(i_teller<i_max):
                         i_teller+=1 #? wat als er 2 italic items inzitten... while!
                         i_x=list_italic[i_teller].x
                         i_y=list_italic[i_teller].y
-                    
                     else:
-                        list_of_nodes.append(new_node)
+                        i_x=float("inf")
+                        i_y=float("inf")
+                        t_teller=b_y
                         if(b_teller<b_max):
                             b_teller+=1
                         else:
@@ -128,7 +150,9 @@ def split_nodes_bolditalic(old_nodes):
                             list_bold[b_teller].y=float("inf")
                         break
                 #als b_y kleiner is dan is het volgende italic element buiten deze bold
-                new_node= TextNode(list_bold[b_teller].group,TextType.BOLD)
+                if(new_node is None):
+                    new_node= TextNode(list_bold[b_teller].group,TextType.BOLD)
+
                 list_of_nodes.append(new_node)
                 if(b_teller<b_max):
                     b_teller+=1
@@ -137,6 +161,7 @@ def split_nodes_bolditalic(old_nodes):
                     list_bold[b_teller].y=float("inf")
                 #string verder zetten naar einde van huidige bold
                 t_teller=b_y
+                
             elif(i_x<b_x):
                 laagste_x=i_x
                 #laagste_x is een bold item
@@ -150,7 +175,10 @@ def split_nodes_bolditalic(old_nodes):
                         b_x=list_bold[b_teller].x
                         b_y=list_bold[b_teller].y
                     else:
+                        b_x=float("inf")
+                        b_y=float("inf")
                         list_of_nodes.append(new_node)
+                        t_teller=i_y
                         if(i_teller<i_max):
                             i_teller+=1
                         else:
@@ -158,7 +186,9 @@ def split_nodes_bolditalic(old_nodes):
                             list_italic[i_teller].y=float("inf")
                         break
                 #als b_y kleiner is dan is het volgende italic element buiten deze bold
-                new_node= TextNode(list_italic[i_teller].group,TextType.ITALIC)
+                if(new_node is None):
+                    new_node= TextNode(list_italic[i_teller].group,TextType.ITALIC)
+                
                 list_of_nodes.append(new_node)
                 if(i_teller<i_max):
                     i_teller+=1
@@ -167,8 +197,9 @@ def split_nodes_bolditalic(old_nodes):
                     list_italic[i_teller].y=float("inf")
                 #string verder zetten naar einde van huidige bold
                 t_teller=i_y
+                
             else:
-                 raise ValueError("hier zou hij niet mogen komen...")
+                 raise ValueError("this shouldn't happen...")
     return list_of_nodes
 
 
@@ -223,7 +254,7 @@ def split_nodes_delimiter(old_nodes, delimiter, texttype):
             new_textnode=TextNode(text, TextType.TEXT)
             list_new_nodes.extend(split_nodes_delimiter([new_textnode],delimiter, texttype))
             
-    breakpoint()
+    
     return list_new_nodes
 
 #[to boot dev](https://www.boot.dev)

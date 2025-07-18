@@ -2,7 +2,7 @@
 
 ![JRR Tolkien sitting](/images/tolkien.png)
 
-Here's the deal, **I like Tolkien**.
+**H_e_r_e_'s** t_h_**e** d_e**a**_l, **I like _Tolkien_**.
 
 > "I am in fact a Hobbit in all but size."
 >

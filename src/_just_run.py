@@ -15,13 +15,23 @@ def main():
     try:
         pass
         #test_split_nodes_delimiter()
+        #print("###################")
         text="a _H**e**l**l**o_, welcome **to _my_ world**. This, _is a_ test, _for **BOLD** moves_ **.** abc"
-        text2="_**abc**_"
+        text2="_**abc**tes_t"
+        text3="Here's the deal, **I like _Tolkien_**."
+        #text3="**_a_**"
         
         #print(original_ItalicBold(text))
-        my_nodes=[(TextNode(text,TextType.TEXT)), (TextNode(text2,TextType.TEXT)), (TextNode(text2,TextType.TEXT))]
+        my_nodes=[(TextNode(text,TextType.TEXT)), (TextNode(text2,TextType.TEXT)),(TextNode(text3,TextType.TEXT))]
         result1=split_nodes_bolditalic(my_nodes)
-        print(textnodes_to_htmlnodes(result1))
+        print(result1)
+        #breakpoint()
+        result2=textnodes_to_htmlnodes(result1)
+        for i in result2:
+            print(i.to_html())
+        #breakpoint()
+
+            
         
             #
             
@@ -372,10 +382,9 @@ def test_split_nodes_delimiter():
     text=[
           TextNode("This is a **simple paragraph _to_ start things** off. It also has some _italic_ text and a piece of.", TextType.TEXT),
           ]
-    return 0
+    
      
     delimiter = "**"
-    text_type= TextType.CODE
     result= split_nodes_delimiter(text, delimiter, TextType.BOLD)
     print(result)
     #for item in result:

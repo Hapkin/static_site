@@ -63,7 +63,29 @@ class HTMLNode(ABC):
         return result
     
     def __repr__(self):
-        return f"{type(self).__name__}{self.tag!r}, children={len(self.children) if self.children else 0})"
+        result=f"{type(self).__name__}"
+        if (self.tag is not None):
+            result+=f"HTML: <{self.tag}>"
+        else:
+            result+=f"HTML: N/A"
+        if (self.value is not None):
+            result+=f"text-inside: {self.value!r}\n"
+        else:
+            result+=f"text-inside: N/A\n"
+        if (self.children is not None):
+            child_types = ", ".join(type(child).__name__ for child in self.children)
+            result += f"children ({len(self.children)}): [{child_types}]\n"
+        else:
+            result += f"no children found"
+        if (self.props is not None):
+            result+=f"Props:\n"
+            props_string=", ".join(f"{key!r}:{value!r}" for key, value in self.props.items())
+            result+=props_string
+        
+        return result
+        
+
+        
     
         '''
     def props_to_html(self):

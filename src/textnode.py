@@ -40,8 +40,16 @@ class TextNode():
         result=f"TextNode({self.text!r}, {self.text_type})"
         if(self.url is not None):
             result+=f", {self.url!r})"
-        if(self.IB is not None):
-            result+=f", {self.IB!r})"
+        #if(self.IB is not None):
+        result+=f",IB: {self.IB!r})"
+        return result
+    
+    def __str__(self):
+        result=f"TextNode({self.text!r}, {self.text_type})"
+        if(self.url is not None):
+            result+=f", {self.url!r})"
+        #if(self.IB is not None):
+        result+=f",IB: {self.IB!r})"
         return result
     
 
